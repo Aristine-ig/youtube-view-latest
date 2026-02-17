@@ -46,8 +46,8 @@ export default function RegisterPage() {
 
         <div className="rounded-2xl border border-white/10 bg-white/5 p-8 backdrop-blur-sm">
           <h2 className="mb-6 text-center text-2xl font-bold text-white">Create Account</h2>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
+          <form onSubmit={handleSubmit} className="space-y-4" suppressHydrationWarning>
+            <div suppressHydrationWarning>
               <label className="mb-1.5 block text-sm font-medium text-gray-300">Full Name</label>
               <input
                 type="text"
@@ -56,9 +56,10 @@ export default function RegisterPage() {
                 onChange={e => setName(e.target.value)}
                 className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-gray-500 outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
                 placeholder="John Doe"
+                suppressHydrationWarning
               />
             </div>
-            <div>
+            <div suppressHydrationWarning>
               <label className="mb-1.5 block text-sm font-medium text-gray-300">Email</label>
               <input
                 type="email"
@@ -67,11 +68,12 @@ export default function RegisterPage() {
                 onChange={e => setEmail(e.target.value)}
                 className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-gray-500 outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
                 placeholder="you@example.com"
+                suppressHydrationWarning
               />
             </div>
-            <div>
+            <div suppressHydrationWarning>
               <label className="mb-1.5 block text-sm font-medium text-gray-300">Password</label>
-              <div className="relative">
+              <div className="relative" suppressHydrationWarning>
                 <input
                   type={showPw ? "text" : "password"}
                   required
@@ -79,8 +81,9 @@ export default function RegisterPage() {
                   onChange={e => setPassword(e.target.value)}
                   className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 pr-11 text-white placeholder-gray-500 outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
                   placeholder="Min 6 characters"
+                  suppressHydrationWarning
                 />
-                <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3 top-3.5 text-gray-500 hover:text-gray-300">
+                <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3 top-3.5 text-gray-500 hover:text-gray-300" suppressHydrationWarning>
                   {showPw ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
               </div>
@@ -89,6 +92,7 @@ export default function RegisterPage() {
               type="submit"
               disabled={loading}
               className="w-full rounded-lg bg-emerald-500 py-3 font-semibold text-white transition hover:bg-emerald-600 disabled:opacity-50"
+              suppressHydrationWarning
             >
               {loading ? "Creating..." : "Create Account"}
             </button>
