@@ -46,7 +46,6 @@ interface Task {
 const emptyForm = {
   channel_name: "",
   title: "",
-  video_thumbnail: "",
   video_length: "",
   required_actions: "",
   reward_amount: "",
@@ -63,7 +62,6 @@ export default function AdminPage() {
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const fetchAnalytics = useCallback(async () => {
     const res = await fetch("/api/admin/analytics");
@@ -86,48 +84,6 @@ export default function AdminPage() {
     if (!user || user.role !== "admin") { router.push("/login"); return; }
     Promise.all([fetchAnalytics(), fetchTasks()]).finally(() => setLoading(false));
   }, [user, authLoading, router, fetchAnalytics, fetchTasks]);
-
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    // Create preview
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setImagePreview(reader.result as string);
-    };
-    reader.readAsDataURL(file);
-
-    // Upload to Supabase storage
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
-      const res = await fetch("/api/upload", { method: "POST", body: formData });
-      if (res.ok) {
-        const data = await res.json();
-        setForm({ ...form, video_thumbnail: data.url });
-        toast.success("Image uploaded");
-      } else {
-        toast.error("Upload failed");
-      }
-    } catch (err) {
-      toast.error("Upload error");
-    }
-  };
-
-  const handleFormOpen = () => {
-    setShowForm(true);
-    setEditingId(null);
-    setForm(emptyForm);
-    setImagePreview(null);
-  };
-
-  const handleFormClose = () => {
-    setShowForm(false);
-    setEditingId(null);
-    setForm(emptyForm);
-    setImagePreview(null);
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -188,14 +144,12 @@ export default function AdminPage() {
     setForm({
       channel_name: task.channel_name || "",
       title: task.title || "",
-      video_thumbnail: task.video_thumbnail || "",
       video_length: task.video_length || "",
       required_actions: task.required_actions || "",
       reward_amount: String(task.reward_amount),
       max_users: String(task.max_users),
       is_enabled: task.is_enabled,
     });
-    setImagePreview(task.video_thumbnail || null);
     setShowForm(true);
   };
 
@@ -268,7 +222,7 @@ export default function AdminPage() {
               <h2 className="text-xl sm:text-2xl font-bold">Manage Tasks</h2>
             </div>
             <button
-              onClick={handleFormOpen}
+              onClick={() => { setShowForm(true); setEditingId(null); setForm(emptyForm); }}
               className="flex items-center gap-2 rounded-lg bg-emerald-500 px-4 py-2.5 text-xs sm:text-sm font-semibold transition hover:bg-emerald-600 whitespace-nowrap flex-shrink-0"
             >
               <Plus className="h-4 w-4" /> <span className="hidden sm:inline">Add Task</span><span className="sm:hidden">Add</span>
@@ -281,7 +235,7 @@ export default function AdminPage() {
               <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl border border-white/10 bg-gray-900 p-6">
                 <div className="mb-4 flex items-center justify-between">
                   <h2 className="text-xl font-bold">{editingId ? "Edit Task" : "Add New Task"}</h2>
-                  <button onClick={handleFormClose}>
+                  <button onClick={() => { setShowForm(false); setEditingId(null); setForm(emptyForm); }}>
                     <X className="h-5 w-5 text-gray-400 hover:text-white" />
                   </button>
                 </div>
@@ -290,105 +244,95 @@ export default function AdminPage() {
                     <label className="mb-1 block text-sm font-medium text-gray-300">Channel Name *</label>
                     <input required value={form.channel_name} onChange={e => setForm({ ...form, channel_name: e.target.value })} className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-white outline-none focus:border-emerald-500" placeholder="Channel name" />
                   </div>
-                  <div>
+                   <div>
                     <label className="mb-1 block text-sm font-medium text-gray-300">Title</label>
                     <input required value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-white outline-none focus:border-emerald-500" placeholder="Title" />
                   </div>
-
-                  {/* Image Upload */}
-                  <div>
-                    <label className="mb-1 block text-sm font-medium text-gray-300">Thumbnail Image</label>
-                    <input type="file" accept="image/*" onChange={handleImageUpload} className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-white outline-none focus:border-emerald-500 text-sm" />
-                    {imagePreview && (
-                      <div className="mt-3 rounded-lg border border-white/10 overflow-hidden">
-                        <img src={imagePreview} alt="Preview" className="w-full h-32 object-cover" />
-                      </div>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="mb-1 block text-sm font-medium text-gray-300">Video Length</label>
-                    <input value={form.video_length} onChange={e => setForm({ ...form, video_length: e.target.value })} className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-white outline-none focus:border-emerald-500" placeholder="e.g. 10:30" />
+                  
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="mb-1 block text-sm font-medium text-gray-300">Video Length</label>
+                      <input value={form.video_length} onChange={e => setForm({ ...form, video_length: e.target.value })} className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-white outline-none focus:border-emerald-500" placeholder="e.g. 10:30" />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-sm font-medium text-gray-300">Reward (Rs) *</label>
+                      <input required type="number" step="0.01" min="0.01" value={form.reward_amount} onChange={e => setForm({ ...form, reward_amount: e.target.value })} className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-white outline-none focus:border-emerald-500" />
+                    </div>
                   </div>
                   <div>
-                    <label className="mb-1 block text-sm font-medium text-gray-300">Reward (Rs) *</label>
-                    <input required type="number" step="0.01" min="0.01" value={form.reward_amount} onChange={e => setForm({ ...form, reward_amount: e.target.value })} className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-white outline-none focus:border-emerald-500" />
+                    <label className="mb-1 block text-sm font-medium text-gray-300">Required Actions</label>
+                    <textarea value={form.required_actions} onChange={e => setForm({ ...form, required_actions: e.target.value })} rows={3} className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-white outline-none focus:border-emerald-500" placeholder="e.g. Like, Subscribe, Comment" />
                   </div>
-                </div>
-
-                <div>
-                  <label className="mb-1 block text-sm font-medium text-gray-300">Required Actions</label>
-                <textarea value={form.required_actions} onChange={e => setForm({ ...form, required_actions: e.target.value })} rows={3} className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-white outline-none focus:border-emerald-500" placeholder="e.g. Like, Subscribe, Comment" />
+                  <div>
+                    <label className="mb-1 block text-sm font-medium text-gray-300">Max Users (Limit)</label>
+                    <input type="number" min="1" value={form.max_users} onChange={e => setForm({ ...form, max_users: e.target.value })} className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-white outline-none focus:border-emerald-500" />
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <label className="text-sm font-medium text-gray-300">Enabled</label>
+                    <button type="button" onClick={() => setForm({ ...form, is_enabled: !form.is_enabled })}>
+                      {form.is_enabled ? <ToggleRight className="h-6 w-6 text-emerald-400" /> : <ToggleLeft className="h-6 w-6 text-gray-500" />}
+                    </button>
+                  </div>
+                  <button type="submit" className="w-full rounded-lg bg-emerald-500 py-3 font-semibold transition hover:bg-emerald-600">
+                    {editingId ? "Update Task" : "Create Task"}
+                  </button>
+                </form>
               </div>
-              <div>
-                <label className="mb-1 block text-sm font-medium text-gray-300">Max Users (Limit)</label>
-                <input type="number" min="1" value={form.max_users} onChange={e => setForm({ ...form, max_users: e.target.value })} className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-white outline-none focus:border-emerald-500" />
-              </div>
-              <div className="flex items-center gap-3">
-                <label className="text-sm font-medium text-gray-300">Enabled</label>
-                <button type="button" onClick={() => setForm({ ...form, is_enabled: !form.is_enabled })}>
-                  {form.is_enabled ? <ToggleRight className="h-6 w-6 text-emerald-400" /> : <ToggleLeft className="h-6 w-6 text-gray-500" />}
-                </button>
-              </div>
-              <button type="submit" className="w-full rounded-lg bg-emerald-500 py-3 font-semibold transition hover:bg-emerald-600">
-                {editingId ? "Update Task" : "Create Task"}
-              </button>
-            </form>
-              </div>
-      </div>
+            </div>
           )}
 
-      {/* Tasks Table */}
-      <div className="overflow-x-auto rounded-xl border border-white/10 scrollbar-thin scrollbar-thumb-emerald-500 scrollbar-track-white/5">
-        <table className="w-full text-xs sm:text-sm">
-          <thead className="border-b border-white/10 bg-white/5 sticky top-0">
-            <tr className="text-left text-gray-400">
-              <th className="px-3 sm:px-4 py-3 whitespace-nowrap">Channel</th>
-              <th className="px-3 sm:px-4 py-3 whitespace-nowrap">Length</th>
-              <th className="px-3 sm:px-4 py-3 whitespace-nowrap">Actions</th>
-              <th className="px-3 sm:px-4 py-3 whitespace-nowrap">Reward</th>
-              <th className="px-3 sm:px-4 py-3 whitespace-nowrap">Users</th>
-              <th className="px-3 sm:px-4 py-3 whitespace-nowrap">Status</th>
-              <th className="px-3 sm:px-4 py-3 whitespace-nowrap text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-white/5">
-            {tasks.map(task => (
-              <tr key={task.id} className="hover:bg-white/5 text-xs sm:text-sm">
-                <td className="px-3 sm:px-4 py-3 font-medium max-w-[100px] truncate">{task.channel_name || "-"}</td>
-                <td className="px-3 sm:px-4 py-3 whitespace-nowrap">{task.video_length || "-"}</td>
-                <td className="px-3 sm:px-4 py-3 max-w-[80px] truncate text-xs">{task.required_actions || "-"}</td>
-                <td className="px-3 sm:px-4 py-3 text-emerald-400 font-medium whitespace-nowrap">${Number(task.reward_amount).toFixed(2)}</td>
-                <td className="px-3 sm:px-4 py-3 whitespace-nowrap">{task.max_users}</td>
-                <td className="px-3 sm:px-4 py-3 whitespace-nowrap">
-                  <button onClick={() => toggleTask(task)}>
-                    {task.is_enabled
-                      ? <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs text-emerald-400 whitespace-nowrap"><ToggleRight className="h-3 w-3" /> <span className="hidden sm:inline">Active</span></span>
-                      : <span className="inline-flex items-center gap-1 rounded-full bg-red-500/10 px-2 py-0.5 text-xs text-red-400 whitespace-nowrap"><ToggleLeft className="h-3 w-3" /> <span className="hidden sm:inline">Disabled</span></span>
-                    }
-                  </button>
-                </td>
-                <td className="px-3 sm:px-4 py-3 whitespace-nowrap">
-                  <div className="flex items-center gap-1 justify-end">
-                    <button onClick={() => editTask(task)} className="rounded-lg p-1.5 text-gray-400 hover:bg-white/10 hover:text-white">
-                      <Pencil className="h-4 w-4" />
-                    </button>
-                    <button onClick={() => deleteTask(task.id)} className="rounded-lg p-1.5 text-gray-400 hover:bg-red-500/10 hover:text-red-400">
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-            {tasks.length === 0 && (
-              <tr><td colSpan={7} className="px-3 sm:px-4 py-8 sm:py-12 text-center text-gray-500 text-xs sm:text-sm">No tasks yet. Click &quot;Add Task&quot; to create one.</td></tr>
-            )}
-          </tbody>
-        </table>
+          {/* Tasks Table */}
+          <div className="overflow-x-auto rounded-xl border border-white/10 scrollbar-thin scrollbar-thumb-emerald-500 scrollbar-track-white/5">
+            <table className="w-full text-xs sm:text-sm">
+              <thead className="border-b border-white/10 bg-white/5 sticky top-0">
+                <tr className="text-left text-gray-400">
+                  <th className="px-3 sm:px-4 py-3 whitespace-nowrap">Channel</th>
+                  <th className="px-3 sm:px-4 py-3 whitespace-nowrap">Length</th>
+                  <th className="px-3 sm:px-4 py-3 whitespace-nowrap">Actions</th>
+                  <th className="px-3 sm:px-4 py-3 whitespace-nowrap">Reward</th>
+                  <th className="px-3 sm:px-4 py-3 whitespace-nowrap">Users</th>
+                  <th className="px-3 sm:px-4 py-3 whitespace-nowrap">Status</th>
+                  <th className="px-3 sm:px-4 py-3 whitespace-nowrap text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-white/5">
+                {tasks.map(task => (
+                  <tr key={task.id} className="hover:bg-white/5 text-xs sm:text-sm">
+                    <td className="px-3 sm:px-4 py-3 font-medium max-w-[100px] truncate">{task.channel_name || "-"}</td>
+                    <td className="px-3 sm:px-4 py-3 whitespace-nowrap">{task.video_length || "-"}</td>
+                    <td className="px-3 sm:px-4 py-3 max-w-[80px] truncate text-xs">{task.required_actions || "-"}</td>
+                    <td className="px-3 sm:px-4 py-3 text-emerald-400 font-medium whitespace-nowrap">${Number(task.reward_amount).toFixed(2)}</td>
+                    <td className="px-3 sm:px-4 py-3 whitespace-nowrap">{task.max_users}</td>
+                    <td className="px-3 sm:px-4 py-3 whitespace-nowrap">
+                      <button onClick={() => toggleTask(task)}>
+                        {task.is_enabled
+                          ? <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs text-emerald-400 whitespace-nowrap"><ToggleRight className="h-3 w-3" /> <span className="hidden sm:inline">Active</span></span>
+                          : <span className="inline-flex items-center gap-1 rounded-full bg-red-500/10 px-2 py-0.5 text-xs text-red-400 whitespace-nowrap"><ToggleLeft className="h-3 w-3" /> <span className="hidden sm:inline">Disabled</span></span>
+                        }
+                      </button>
+                    </td>
+                    <td className="px-3 sm:px-4 py-3 whitespace-nowrap">
+                      <div className="flex items-center gap-1 justify-end">
+                        <button onClick={() => editTask(task)} className="rounded-lg p-1.5 text-gray-400 hover:bg-white/10 hover:text-white">
+                          <Pencil className="h-4 w-4" />
+                        </button>
+                        <button onClick={() => deleteTask(task.id)} className="rounded-lg p-1.5 text-gray-400 hover:bg-red-500/10 hover:text-red-400">
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+                {tasks.length === 0 && (
+                  <tr><td colSpan={7} className="px-3 sm:px-4 py-8 sm:py-12 text-center text-gray-500 text-xs sm:text-sm">No tasks yet. Click &quot;Add Task&quot; to create one.</td></tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
-      </div >
-    </div >
   );
 }
 
