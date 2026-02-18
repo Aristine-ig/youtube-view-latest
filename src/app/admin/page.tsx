@@ -90,6 +90,25 @@ export default function AdminPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate required fields
+    if (!form.channel_name || !form.channel_name.trim()) {
+      toast.error("Channel name is required");
+      return;
+    }
+    if (!form.title || !form.title.trim()) {
+      toast.error("Title is required");
+      return;
+    }
+    if (!form.video_thumbnail || !form.video_thumbnail.trim()) {
+      toast.error("Video thumbnail is required");
+      return;
+    }
+    if (!form.reward_amount || parseFloat(form.reward_amount) <= 0) {
+      toast.error("Valid reward amount is required");
+      return;
+    }
+    
     try {
       if (editingId) {
         const res = await fetch("/api/admin/tasks", {
@@ -111,6 +130,7 @@ export default function AdminPage() {
       setShowForm(false);
       setEditingId(null);
       setForm(emptyForm);
+      setImagePreview(null);
       await Promise.all([fetchTasks(), fetchAnalytics()]);
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : "Failed");
