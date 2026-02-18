@@ -193,6 +193,18 @@ export default function DashboardPage() {
                   </div>
                 )}
               </div>
+              {activeTask.keywords && (
+                <div className="mb-6 rounded-xl bg-white/5 p-4">
+                  <div className="text-sm text-gray-400 mb-2">Keywords</div>
+                  <div className="flex flex-wrap gap-2">
+                    {activeTask.keywords.split(',').map((keyword, idx) => (
+                      <span key={idx} className="rounded-full bg-emerald-500/10 px-3 py-1 text-sm text-emerald-400">
+                        {keyword.trim()}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
               {activeTask.required_actions && (
                 <div className="mb-6 rounded-xl bg-amber-500/10 border border-amber-500/20 p-4">
                   <div className="text-sm font-medium text-amber-400 mb-1">Required Actions</div>
@@ -319,7 +331,16 @@ export default function DashboardPage() {
                         {task.channel_name && (
                           <div className="text-xs sm:text-sm text-gray-400 truncate">{task.channel_name}</div>
                         )}
-                        <div className="text-xs sm:text-sm text-gray-400">
+                        {task.keywords && (
+                          <div className="flex flex-wrap gap-1 mt-1">
+                            {task.keywords.split(',').slice(0, 3).map((keyword, idx) => (
+                              <span key={idx} className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs text-emerald-400">
+                                {keyword.trim()}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                        <div className="text-xs sm:text-sm text-gray-400 mt-1">
                           {task.user_status?.completion_pct || 0}% completed
                         </div>
                       </div>
@@ -527,6 +548,15 @@ function TaskCard({ task, onStart, starting }: { task: Task; onStart: () => void
         )}
         {task.required_actions && (
           <p className="mb-3 text-sm text-gray-400 line-clamp-2">{task.required_actions}</p>
+        )}
+        {task.keywords && (
+          <div className="mb-3 flex flex-wrap gap-1.5">
+            {task.keywords.split(',').map((keyword, idx) => (
+              <span key={idx} className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs text-emerald-400">
+                {keyword.trim()}
+              </span>
+            ))}
+          </div>
         )}
         <div className="mb-4 flex items-center gap-4 text-xs text-gray-400">
           <span className="flex items-center gap-1">
