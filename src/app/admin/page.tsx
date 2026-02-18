@@ -314,27 +314,26 @@ export default function AdminPage() {
                     <label className="mb-1 block text-sm font-medium text-gray-300">Reward (Rs) *</label>
                     <input required type="number" step="0.01" min="0.01" value={form.reward_amount} onChange={e => setForm({ ...form, reward_amount: e.target.value })} className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-white outline-none focus:border-emerald-500" />
                   </div>
+                </div>
 
-                  <div>
-                    <label className="mb-1 block text-sm font-medium text-gray-300">Required Actions</label>
-                  <div>
-                    <label className="mb-1 block text-sm font-medium text-gray-300">Required Actions</label>
-                    <textarea value={form.required_actions} onChange={e => setForm({ ...form, required_actions: e.target.value })} rows={3} className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-white outline-none focus:border-emerald-500" placeholder="e.g. Like, Subscribe, Comment" />
-                  </div>
-                  <div>
-                    <label className="mb-1 block text-sm font-medium text-gray-300">Max Users (Limit)</label>
-                    <input type="number" min="1" value={form.max_users} onChange={e => setForm({ ...form, max_users: e.target.value })} className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-white outline-none focus:border-emerald-500" />
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <label className="text-sm font-medium text-gray-300">Enabled</label>
-                    <button type="button" onClick={() => setForm({ ...form, is_enabled: !form.is_enabled })}>
-                      {form.is_enabled ? <ToggleRight className="h-6 w-6 text-emerald-400" /> : <ToggleLeft className="h-6 w-6 text-gray-500" />}
-                    </button>
-                  </div>
-                  <button type="submit" className="w-full rounded-lg bg-emerald-500 py-3 font-semibold transition hover:bg-emerald-600">
-                    {editingId ? "Update Task" : "Create Task"}
-                  </button>
-                </form>
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-gray-300">Required Actions</label>
+                <textarea value={form.required_actions} onChange={e => setForm({ ...form, required_actions: e.target.value })} rows={3} className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-white outline-none focus:border-emerald-500" placeholder="e.g. Like, Subscribe, Comment" />
+              </div>
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-300">Max Users (Limit)</label>
+                <input type="number" min="1" value={form.max_users} onChange={e => setForm({ ...form, max_users: e.target.value })} className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-white outline-none focus:border-emerald-500" />
+              </div>
+              <div className="flex items-center gap-3">
+                <label className="text-sm font-medium text-gray-300">Enabled</label>
+                <button type="button" onClick={() => setForm({ ...form, is_enabled: !form.is_enabled })}>
+                  {form.is_enabled ? <ToggleRight className="h-6 w-6 text-emerald-400" /> : <ToggleLeft className="h-6 w-6 text-gray-500" />}
+                </button>
+              </div>
+              <button type="submit" className="w-full rounded-lg bg-emerald-500 py-3 font-semibold transition hover:bg-emerald-600">
+                {editingId ? "Update Task" : "Create Task"}
+              </button>
+            </form>
               </div>
       </div>
           )}
