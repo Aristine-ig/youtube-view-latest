@@ -198,7 +198,7 @@ export default function AdminPage() {
           </div>
 
           {analytics && (
-            <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-3 sm:gap-4 grid-cols-2 sm:grid-cols-2 lg:grid-cols-4">
               <StatCard icon={Users} label="Total Users" value={analytics.totalUsers} sub={`${analytics.activeUsers} active, ${analytics.suspendedUsers} suspended`} />
               <StatCard icon={ListVideo} label="Total Tasks" value={analytics.totalTasks} sub={`${analytics.activeTasks} active`} />
               <StatCard icon={CheckCircle} label="Completions" value={analytics.totalCompletions} sub={`${analytics.inProgressCompletions} in progress`} color="emerald" />
@@ -216,14 +216,14 @@ export default function AdminPage() {
 
         {/* Task Management Section */}
         <div>
-          <div className="mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
+          <div className="mb-6 flex items-center justify-between gap-3 sm:gap-4">
             <div className="flex items-center gap-3">
-              <ListVideo className="h-5 w-5 sm:h-6 sm:w-6 text-emerald-400" />
+              <ListVideo className="h-5 w-5 sm:h-6 sm:w-6 text-emerald-400 flex-shrink-0" />
               <h2 className="text-xl sm:text-2xl font-bold">Manage Tasks</h2>
             </div>
             <button
               onClick={() => { setShowForm(true); setEditingId(null); setForm(emptyForm); }}
-              className="flex items-center gap-2 rounded-lg bg-emerald-500 px-4 py-2.5 text-xs sm:text-sm font-semibold transition hover:bg-emerald-600 whitespace-nowrap"
+              className="flex items-center gap-2 rounded-lg bg-emerald-500 px-4 py-2.5 text-xs sm:text-sm font-semibold transition hover:bg-emerald-600 whitespace-nowrap flex-shrink-0"
             >
               <Plus className="h-4 w-4" /> <span className="hidden sm:inline">Add Task</span><span className="sm:hidden">Add</span>
             </button>
@@ -283,15 +283,15 @@ export default function AdminPage() {
           )}
 
           {/* Tasks Table */}
-          <div className="overflow-x-auto rounded-xl border border-white/10">
+          <div className="overflow-x-auto rounded-xl border border-white/10 scrollbar-thin scrollbar-thumb-emerald-500 scrollbar-track-white/5">
             <table className="w-full text-xs sm:text-sm">
-              <thead className="border-b border-white/10 bg-white/5">
+              <thead className="border-b border-white/10 bg-white/5 sticky top-0">
                 <tr className="text-left text-gray-400">
                   <th className="px-3 sm:px-4 py-3 whitespace-nowrap">Channel</th>
-                  <th className="px-3 sm:px-4 py-3 whitespace-nowrap hidden sm:table-cell">Length</th>
-                  <th className="px-3 sm:px-4 py-3 whitespace-nowrap hidden lg:table-cell">Actions</th>
+                  <th className="px-3 sm:px-4 py-3 whitespace-nowrap">Length</th>
+                  <th className="px-3 sm:px-4 py-3 whitespace-nowrap">Actions</th>
                   <th className="px-3 sm:px-4 py-3 whitespace-nowrap">Reward</th>
-                  <th className="px-3 sm:px-4 py-3 whitespace-nowrap hidden md:table-cell">Users</th>
+                  <th className="px-3 sm:px-4 py-3 whitespace-nowrap">Users</th>
                   <th className="px-3 sm:px-4 py-3 whitespace-nowrap">Status</th>
                   <th className="px-3 sm:px-4 py-3 whitespace-nowrap text-right">Actions</th>
                 </tr>
@@ -299,12 +299,12 @@ export default function AdminPage() {
               <tbody className="divide-y divide-white/5">
                 {tasks.map(task => (
                   <tr key={task.id} className="hover:bg-white/5 text-xs sm:text-sm">
-                    <td className="px-3 sm:px-4 py-3 font-medium max-w-[120px] truncate">{task.channel_name || "-"}</td>
-                    <td className="px-3 sm:px-4 py-3 hidden sm:table-cell">{task.video_length || "-"}</td>
-                    <td className="px-3 sm:px-4 py-3 max-w-[100px] truncate hidden lg:table-cell text-xs">{task.required_actions || "-"}</td>
-                    <td className="px-3 sm:px-4 py-3 text-emerald-400 font-medium">${Number(task.reward_amount).toFixed(2)}</td>
-                    <td className="px-3 sm:px-4 py-3 hidden md:table-cell">{task.max_users}</td>
-                    <td className="px-3 sm:px-4 py-3">
+                    <td className="px-3 sm:px-4 py-3 font-medium max-w-[100px] truncate">{task.channel_name || "-"}</td>
+                    <td className="px-3 sm:px-4 py-3 whitespace-nowrap">{task.video_length || "-"}</td>
+                    <td className="px-3 sm:px-4 py-3 max-w-[80px] truncate text-xs">{task.required_actions || "-"}</td>
+                    <td className="px-3 sm:px-4 py-3 text-emerald-400 font-medium whitespace-nowrap">${Number(task.reward_amount).toFixed(2)}</td>
+                    <td className="px-3 sm:px-4 py-3 whitespace-nowrap">{task.max_users}</td>
+                    <td className="px-3 sm:px-4 py-3 whitespace-nowrap">
                       <button onClick={() => toggleTask(task)}>
                         {task.is_enabled
                           ? <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs text-emerald-400 whitespace-nowrap"><ToggleRight className="h-3 w-3" /> <span className="hidden sm:inline">Active</span></span>
@@ -312,7 +312,7 @@ export default function AdminPage() {
                         }
                       </button>
                     </td>
-                    <td className="px-3 sm:px-4 py-3">
+                    <td className="px-3 sm:px-4 py-3 whitespace-nowrap">
                       <div className="flex items-center gap-1 justify-end">
                         <button onClick={() => editTask(task)} className="rounded-lg p-1.5 text-gray-400 hover:bg-white/10 hover:text-white">
                           <Pencil className="h-4 w-4" />
@@ -321,6 +321,15 @@ export default function AdminPage() {
                           <Trash2 className="h-4 w-4" />
                         </button>
                       </div>
+                    </td>
+                  </tr>
+                ))}
+                {tasks.length === 0 && (
+                  <tr><td colSpan={7} className="px-3 sm:px-4 py-8 sm:py-12 text-center text-gray-500 text-xs sm:text-sm">No tasks yet. Click &quot;Add Task&quot; to create one.</td></tr>
+                )}
+              </tbody>
+            </table>
+          </div>
                     </td>
                   </tr>
                 ))}
