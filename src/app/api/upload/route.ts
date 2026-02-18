@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { put } from "@vercel/blob";
+import { supabase } from "@/lib/supabase";
 import { requireAdmin } from "@/lib/auth";
 
 export async function POST(req: NextRequest) {
@@ -13,12 +13,31 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
     }
 
-    // Upload to Vercel Blob
-    const blob = await put(`tasks/${Date.now()}-${file.name}`, file, {
-      access: "public",
-    });
+    // Generate unique filename
+    const fileName = `${Date.now()}-${file.name}`;
+    const bucket = "task-thumbnails";
 
-    return NextResponse.json({ url: blob.url });
+    // Convert file to buffer
+    const buffer = await file.arrayBuffer();
+
+    // Upload to Supabase storage
+    const { data, error } = await supabase.storage
+      .from(bucket)
+      .upload(`tasks/${fileName}`, buffer, {
+        contentType: file.type,
+        upsert: false,
+      });
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    // Get public URL
+    const { data: urlData } = supabase.storage
+      .from(bucket)
+      .getPublicUrl(`tasks/${fileName}`);
+
+    return NextResponse.json({ url: urlData.publicUrl });
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : "Error";
     return NextResponse.json({ error: msg }, { status: msg === "Forbidden" ? 403 : 500 });
