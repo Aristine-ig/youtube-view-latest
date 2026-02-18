@@ -305,8 +305,14 @@ export default function DashboardPage() {
                 {ongoing.map(task => (
                   <div key={task.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between rounded-xl border border-white/10 bg-white/5 p-4 gap-3 sm:gap-4">
                     <div className="flex items-center gap-3 w-full sm:w-auto">
-                      <div className="flex h-14 w-20 items-center justify-center rounded-lg bg-white/10 flex-shrink-0">
-                        <Play className="h-5 w-5 text-gray-500" />
+                      <div className="h-14 w-20 rounded-lg bg-white/10 flex-shrink-0 overflow-hidden">
+                        {task.video_thumbnail ? (
+                          <img src={task.video_thumbnail} alt={task.title || "Task"} className="h-full w-full object-cover" />
+                        ) : (
+                          <div className="flex h-full w-full items-center justify-center">
+                            <Play className="h-5 w-5 text-gray-500" />
+                          </div>
+                        )}
                       </div>
                       <div className="min-w-0">
                         <div className="font-medium truncate">{task.title || "Task"}</div>
@@ -349,8 +355,14 @@ export default function DashboardPage() {
                   {completed.map(task => (
                     <div key={task.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between rounded-xl border border-white/10 bg-white/5 p-4 gap-3 sm:gap-4">
                       <div className="flex items-center gap-3 w-full sm:w-auto min-w-0">
-                        <div className="flex h-14 w-20 items-center justify-center rounded-lg bg-white/10 flex-shrink-0">
-                          <Play className="h-5 w-5 text-gray-500" />
+                        <div className="h-14 w-20 rounded-lg bg-white/10 flex-shrink-0 overflow-hidden">
+                          {task.video_thumbnail ? (
+                            <img src={task.video_thumbnail} alt={task.title || "Task"} className="h-full w-full object-cover" />
+                          ) : (
+                            <div className="flex h-full w-full items-center justify-center">
+                              <Play className="h-5 w-5 text-gray-500" />
+                            </div>
+                          )}
                         </div>
                         <div className="min-w-0">
                         <div className="font-medium truncate">{task.title || "Task"}</div>
