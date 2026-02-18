@@ -306,7 +306,6 @@ export default function AdminPage() {
                     )}
                   </div>
 
-
                   <div>
                     <label className="mb-1 block text-sm font-medium text-gray-300">Video Length</label>
                     <input value={form.video_length} onChange={e => setForm({ ...form, video_length: e.target.value })} className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-white outline-none focus:border-emerald-500" placeholder="e.g. 10:30" />
@@ -315,9 +314,10 @@ export default function AdminPage() {
                     <label className="mb-1 block text-sm font-medium text-gray-300">Reward (Rs) *</label>
                     <input required type="number" step="0.01" min="0.01" value={form.reward_amount} onChange={e => setForm({ ...form, reward_amount: e.target.value })} className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-white outline-none focus:border-emerald-500" />
                   </div>
-              </div>
-              <div>
-                <label className="mb-1 block text-sm font-medium text-gray-300">Required Actions</label>
+                </div>
+
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-gray-300">Required Actions</label>
                 <textarea value={form.required_actions} onChange={e => setForm({ ...form, required_actions: e.target.value })} rows={3} className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-white outline-none focus:border-emerald-500" placeholder="e.g. Like, Subscribe, Comment" />
               </div>
               <div>
