@@ -168,6 +168,13 @@ export default function AdminPage() {
       return;
     }
 
+    // Validate file size (max 1MB)
+    const maxSize = 1 * 1024 * 1024; // 1MB in bytes
+    if (file.size > maxSize) {
+      toast.error("Image size must be less than 1MB");
+      return;
+    }
+
     // Create preview
     const reader = new FileReader();
     reader.onloadend = () => {
@@ -175,7 +182,7 @@ export default function AdminPage() {
     };
     reader.readAsDataURL(file);
 
-    // Upload to Supabase
+    // Upload to Supabase (compression handled by API)
     setUploading(true);
     try {
       const formData = new FormData();
@@ -184,12 +191,13 @@ export default function AdminPage() {
       if (res.ok) {
         const data = await res.json();
         setForm({ ...form, video_thumbnail: data.url });
-        toast.success("Image uploaded");
+        toast.success("Image uploaded and compressed");
       } else {
-        throw new Error("Upload failed");
+        const error = await res.json();
+        throw new Error(error.error || "Upload failed");
       }
     } catch (err) {
-      toast.error("Failed to upload image");
+      toast.error(err instanceof Error ? err.message : "Failed to upload image");
       setImagePreview(null);
     } finally {
       setUploading(false);
