@@ -330,15 +330,6 @@ export default function AdminPage() {
               </tbody>
             </table>
           </div>
-                    </td>
-                  </tr>
-                ))}
-                {tasks.length === 0 && (
-                  <tr><td colSpan={7} className="px-3 sm:px-4 py-8 sm:py-12 text-center text-gray-500 text-xs sm:text-sm">No tasks yet. Click &quot;Add Task&quot; to create one.</td></tr>
-                )}
-              </tbody>
-            </table>
-          </div>
         </div>
       </div>
     </div>
