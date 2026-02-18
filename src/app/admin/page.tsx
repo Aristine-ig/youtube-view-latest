@@ -122,9 +122,13 @@ export default function AdminPage() {
 
   const handleFormClose = () => {
     setShowForm(false);
+  const handleFormClose = () => {
+    setShowForm(false);
     setEditingId(null);
     setForm(emptyForm);
     setImagePreview(null);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
