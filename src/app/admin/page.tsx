@@ -295,8 +295,18 @@ export default function AdminPage() {
                     <input required value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-white outline-none focus:border-emerald-500" placeholder="Title" />
                   </div>
                   
+                  {/* Image Upload */}
+                  <div>
+                    <label className="mb-1 block text-sm font-medium text-gray-300">Thumbnail Image</label>
+                    <input type="file" accept="image/*" onChange={handleImageUpload} className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-white outline-none focus:border-emerald-500 text-sm" />
+                    {imagePreview && (
+                      <div className="mt-3 rounded-lg border border-white/10 overflow-hidden">
+                        <img src={imagePreview} alt="Preview" className="w-full h-32 object-cover" />
+                      </div>
+                    )}
+                  </div>
                   
-                  <div className="grid grid-cols-2 gap-4">
+                  
                     <div>
                       <label className="mb-1 block text-sm font-medium text-gray-300">Video Length</label>
                       <input value={form.video_length} onChange={e => setForm({ ...form, video_length: e.target.value })} className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-white outline-none focus:border-emerald-500" placeholder="e.g. 10:30" />
