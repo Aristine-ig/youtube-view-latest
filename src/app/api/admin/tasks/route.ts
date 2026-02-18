@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
   try {
     await requireAdmin();
     const body = await req.json();
-    const { title, channel_name, video_thumbnail, video_length, required_actions, reward_amount, max_users, is_enabled } = body;
+    const { title, channel_name, video_thumbnail, keywords, video_length, required_actions, reward_amount, max_users, is_enabled } = body;
 
     if (!title || title.trim() === '' || !channel_name || channel_name.trim() === '' || !reward_amount) {
       return NextResponse.json({ error: "Title, channel name and reward amount are required" }, { status: 400 });
@@ -40,6 +40,7 @@ export async function POST(req: NextRequest) {
         title: title,
         channel_name: channel_name || null,
         video_thumbnail: video_thumbnail || null,
+        keywords: keywords || null,
         video_length: video_length || null,
         required_actions: required_actions || null,
         reward_amount: parsedRewardAmount,

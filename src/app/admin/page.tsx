@@ -47,6 +47,7 @@ const emptyForm = {
   channel_name: "",
   title: "",
   video_thumbnail: "",
+  keywords: "",
   video_length: "",
   required_actions: "",
   reward_amount: "",
@@ -168,6 +169,7 @@ export default function AdminPage() {
       channel_name: task.channel_name || "",
       title: task.title || "",
       video_thumbnail: task.video_thumbnail || "",
+      keywords: task.keywords || "",
       video_length: task.video_length || "",
       required_actions: task.required_actions || "",
       reward_amount: String(task.reward_amount),
@@ -335,6 +337,17 @@ export default function AdminPage() {
                         <img src={imagePreview} alt="Thumbnail preview" className="w-full h-48 object-cover" />
                       </div>
                     )}
+                  </div>
+
+                  <div>
+                    <label className="mb-1 block text-sm font-medium text-gray-300">Keywords / Hashtags</label>
+                    <input 
+                      value={form.keywords} 
+                      onChange={e => setForm({ ...form, keywords: e.target.value })} 
+                      className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-white outline-none focus:border-emerald-500" 
+                      placeholder="e.g. gaming, tutorial, music"
+                    />
+                    <p className="mt-1 text-xs text-gray-500">Separate multiple keywords with commas</p>
                   </div>
                   
                   <div className="grid grid-cols-2 gap-4">
