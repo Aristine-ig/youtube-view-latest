@@ -46,6 +46,7 @@ interface Task {
 const emptyForm = {
   channel_name: "",
   title: "",
+  video_thumbnail: "",
   video_length: "",
   required_actions: "",
   reward_amount: "",
@@ -62,6 +63,8 @@ export default function AdminPage() {
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
 
   const fetchAnalytics = useCallback(async () => {
     const res = await fetch("/api/admin/analytics");
@@ -87,6 +90,25 @@ export default function AdminPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate required fields
+    if (!form.channel_name || !form.channel_name.trim()) {
+      toast.error("Channel name is required");
+      return;
+    }
+    if (!form.title || !form.title.trim()) {
+      toast.error("Title is required");
+      return;
+    }
+    if (!form.video_thumbnail || !form.video_thumbnail.trim()) {
+      toast.error("Video thumbnail is required");
+      return;
+    }
+    if (!form.reward_amount || parseFloat(form.reward_amount) <= 0) {
+      toast.error("Valid reward amount is required");
+      return;
+    }
+    
     try {
       if (editingId) {
         const res = await fetch("/api/admin/tasks", {
@@ -108,6 +130,7 @@ export default function AdminPage() {
       setShowForm(false);
       setEditingId(null);
       setForm(emptyForm);
+      setImagePreview(null);
       await Promise.all([fetchTasks(), fetchAnalytics()]);
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : "Failed");
@@ -144,13 +167,61 @@ export default function AdminPage() {
     setForm({
       channel_name: task.channel_name || "",
       title: task.title || "",
+      video_thumbnail: task.video_thumbnail || "",
       video_length: task.video_length || "",
       required_actions: task.required_actions || "",
       reward_amount: String(task.reward_amount),
       max_users: String(task.max_users),
       is_enabled: task.is_enabled,
     });
+    setImagePreview(task.video_thumbnail || null);
     setShowForm(true);
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please select an image file");
+      return;
+    }
+
+    // Validate file size (max 1MB)
+    const maxSize = 1 * 1024 * 1024; // 1MB in bytes
+    if (file.size > maxSize) {
+      toast.error("Image size must be less than 1MB");
+      return;
+    }
+
+    // Create preview
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImagePreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+
+    // Upload to Supabase (compression handled by API)
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/upload", { method: "POST", body: formData });
+      if (res.ok) {
+        const data = await res.json();
+        setForm({ ...form, video_thumbnail: data.url });
+        toast.success("Image uploaded and compressed");
+      } else {
+        const error = await res.json();
+        throw new Error(error.error || "Upload failed");
+      }
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to upload image");
+      setImagePreview(null);
+    } finally {
+      setUploading(false);
+    }
   };
 
   if (authLoading || loading) {
@@ -222,7 +293,7 @@ export default function AdminPage() {
               <h2 className="text-xl sm:text-2xl font-bold">Manage Tasks</h2>
             </div>
             <button
-              onClick={() => { setShowForm(true); setEditingId(null); setForm(emptyForm); }}
+              onClick={() => { setShowForm(true); setEditingId(null); setForm(emptyForm); setImagePreview(null); }}
               className="flex items-center gap-2 rounded-lg bg-emerald-500 px-4 py-2.5 text-xs sm:text-sm font-semibold transition hover:bg-emerald-600 whitespace-nowrap flex-shrink-0"
             >
               <Plus className="h-4 w-4" /> <span className="hidden sm:inline">Add Task</span><span className="sm:hidden">Add</span>
@@ -235,7 +306,7 @@ export default function AdminPage() {
               <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl border border-white/10 bg-gray-900 p-6">
                 <div className="mb-4 flex items-center justify-between">
                   <h2 className="text-xl font-bold">{editingId ? "Edit Task" : "Add New Task"}</h2>
-                  <button onClick={() => { setShowForm(false); setEditingId(null); setForm(emptyForm); }}>
+                  <button onClick={() => { setShowForm(false); setEditingId(null); setForm(emptyForm); setImagePreview(null); }}>
                     <X className="h-5 w-5 text-gray-400 hover:text-white" />
                   </button>
                 </div>
@@ -249,6 +320,22 @@ export default function AdminPage() {
                     <input required value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-white outline-none focus:border-emerald-500" placeholder="Title" />
                   </div>
                   
+                  <div>
+                    <label className="mb-1 block text-sm font-medium text-gray-300">Video Thumbnail</label>
+                    <input 
+                      type="file" 
+                      accept="image/*" 
+                      onChange={handleImageUpload} 
+                      disabled={uploading}
+                      className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-white outline-none focus:border-emerald-500 file:mr-4 file:rounded file:border-0 file:bg-emerald-500 file:px-3 file:py-1 file:text-sm file:text-white file:cursor-pointer hover:file:bg-emerald-600"
+                    />
+                    {uploading && <p className="mt-2 text-sm text-gray-400">Uploading...</p>}
+                    {imagePreview && (
+                      <div className="mt-3 rounded-lg border border-white/10 overflow-hidden">
+                        <img src={imagePreview} alt="Thumbnail preview" className="w-full h-48 object-cover" />
+                      </div>
+                    )}
+                  </div>
                   
                   <div className="grid grid-cols-2 gap-4">
                     <div>
