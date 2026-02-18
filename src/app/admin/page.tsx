@@ -125,7 +125,7 @@ export default function AdminPage() {
     setEditingId(null);
     setForm(emptyForm);
     setImagePreview(null);
-  };
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       if (editingId) {
