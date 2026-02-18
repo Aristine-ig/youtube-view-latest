@@ -163,42 +163,42 @@ export default function AdminPage() {
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
-      <nav className="border-b border-white/10 px-6 py-4">
-        <div className="mx-auto flex max-w-7xl items-center justify-between">
-          <Link href="/admin" className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-500">
-              <Play className="h-5 w-5 text-white" fill="white" />
+      <nav className="border-b border-white/10 px-4 sm:px-6 py-3 sm:py-4">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-2 flex-wrap">
+          <Link href="/admin" className="flex items-center gap-2 flex-shrink-0">
+            <div className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-lg bg-emerald-500">
+              <Play className="h-4 w-4 sm:h-5 sm:w-5 text-white" fill="white" />
             </div>
-            <span className="text-xl font-bold">WatchEarn</span>
+            <span className="text-lg sm:text-xl font-bold hidden sm:inline">WatchEarn</span>
             <span className="rounded-md bg-amber-500/10 px-2 py-0.5 text-xs font-medium text-amber-400">Admin</span>
           </Link>
-          <div className="flex items-center gap-3">
-            <Link href="/admin" className="flex items-center gap-1.5 rounded-lg bg-white/10 px-3 py-2 text-sm text-white">
-              <LayoutDashboard className="h-4 w-4" /> Dashboard
+          <div className="flex items-center gap-1 sm:gap-1.5 ml-auto">
+            <Link href="/admin" className="flex items-center gap-1 rounded-lg bg-white/10 px-2 sm:px-3 py-2 text-xs sm:text-sm text-white whitespace-nowrap">
+              <LayoutDashboard className="h-3 w-3 sm:h-4 sm:w-4" /> <span className="hidden sm:inline">Dashboard</span>
             </Link>
-            <Link href="/admin/users" className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm text-gray-400 hover:bg-white/5 hover:text-white">
-              <Users className="h-4 w-4" /> Users
+            <Link href="/admin/users" className="flex items-center gap-1 rounded-lg px-2 sm:px-3 py-2 text-xs sm:text-sm text-gray-400 hover:bg-white/5 hover:text-white whitespace-nowrap">
+              <Users className="h-3 w-3 sm:h-4 sm:w-4" /> <span className="hidden sm:inline">Users</span>
             </Link>
-            <Link href="/admin/withdrawals" className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm text-gray-400 hover:bg-white/5 hover:text-white">
-              <ArrowDownToLine className="h-4 w-4" /> Withdrawals
+            <Link href="/admin/withdrawals" className="flex items-center gap-1 rounded-lg px-2 sm:px-3 py-2 text-xs sm:text-sm text-gray-400 hover:bg-white/5 hover:text-white whitespace-nowrap">
+              <ArrowDownToLine className="h-3 w-3 sm:h-4 sm:w-4" /> <span className="hidden sm:inline">Withdrawals</span>
             </Link>
-            <button onClick={async () => { await logout(); router.push("/"); }} className="ml-2 text-gray-400 hover:text-white">
-              <LogOut className="h-5 w-5" />
+            <button onClick={async () => { await logout(); router.push("/"); }} className="ml-1 text-gray-400 hover:text-white flex-shrink-0">
+              <LogOut className="h-4 w-4 sm:h-5 sm:w-5" />
             </button>
           </div>
         </div>
       </nav>
 
-      <div className="mx-auto max-w-7xl px-6 py-8">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 py-6 sm:py-8">
         {/* Analytics Section */}
         <div className="mb-10">
           <div className="mb-6 flex items-center gap-3">
-            <LayoutDashboard className="h-6 w-6 text-emerald-400" />
-            <h1 className="text-2xl font-bold">Analytics Dashboard</h1>
+            <LayoutDashboard className="h-5 w-5 sm:h-6 sm:w-6 text-emerald-400" />
+            <h1 className="text-xl sm:text-2xl font-bold">Analytics Dashboard</h1>
           </div>
 
           {analytics && (
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
               <StatCard icon={Users} label="Total Users" value={analytics.totalUsers} sub={`${analytics.activeUsers} active, ${analytics.suspendedUsers} suspended`} />
               <StatCard icon={ListVideo} label="Total Tasks" value={analytics.totalTasks} sub={`${analytics.activeTasks} active`} />
               <StatCard icon={CheckCircle} label="Completions" value={analytics.totalCompletions} sub={`${analytics.inProgressCompletions} in progress`} color="emerald" />
@@ -216,16 +216,16 @@ export default function AdminPage() {
 
         {/* Task Management Section */}
         <div>
-          <div className="mb-6 flex items-center justify-between">
+          <div className="mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
             <div className="flex items-center gap-3">
-              <ListVideo className="h-6 w-6 text-emerald-400" />
-              <h2 className="text-2xl font-bold">Manage Tasks</h2>
+              <ListVideo className="h-5 w-5 sm:h-6 sm:w-6 text-emerald-400" />
+              <h2 className="text-xl sm:text-2xl font-bold">Manage Tasks</h2>
             </div>
             <button
               onClick={() => { setShowForm(true); setEditingId(null); setForm(emptyForm); }}
-              className="flex items-center gap-2 rounded-lg bg-emerald-500 px-4 py-2.5 text-sm font-semibold transition hover:bg-emerald-600"
+              className="flex items-center gap-2 rounded-lg bg-emerald-500 px-4 py-2.5 text-xs sm:text-sm font-semibold transition hover:bg-emerald-600 whitespace-nowrap"
             >
-              <Plus className="h-4 w-4" /> Add Task
+              <Plus className="h-4 w-4" /> <span className="hidden sm:inline">Add Task</span><span className="sm:hidden">Add</span>
             </button>
           </div>
 
@@ -283,39 +283,37 @@ export default function AdminPage() {
           )}
 
           {/* Tasks Table */}
-          <div className="overflow-hidden rounded-xl border border-white/10">
-            <table className="w-full text-sm">
+          <div className="overflow-x-auto rounded-xl border border-white/10">
+            <table className="w-full text-xs sm:text-sm">
               <thead className="border-b border-white/10 bg-white/5">
                 <tr className="text-left text-gray-400">
-                  <th className="px-4 py-3">Channel Name</th>
-                  <th className="px-4 py-3">Video Length</th>
-                  <th className="px-4 py-3">Required Actions</th>
-                  <th className="px-4 py-3">Reward</th>
-                  <th className="px-4 py-3">Users (Limit)</th>
-                  <th className="px-4 py-3">Completions</th>
-                  <th className="px-4 py-3">Status</th>
-                  <th className="px-4 py-3">Actions</th>
+                  <th className="px-3 sm:px-4 py-3 whitespace-nowrap">Channel</th>
+                  <th className="px-3 sm:px-4 py-3 whitespace-nowrap hidden sm:table-cell">Length</th>
+                  <th className="px-3 sm:px-4 py-3 whitespace-nowrap hidden lg:table-cell">Actions</th>
+                  <th className="px-3 sm:px-4 py-3 whitespace-nowrap">Reward</th>
+                  <th className="px-3 sm:px-4 py-3 whitespace-nowrap hidden md:table-cell">Users</th>
+                  <th className="px-3 sm:px-4 py-3 whitespace-nowrap">Status</th>
+                  <th className="px-3 sm:px-4 py-3 whitespace-nowrap text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
                 {tasks.map(task => (
-                  <tr key={task.id} className="hover:bg-white/5">
-                    <td className="px-4 py-3 font-medium">{task.channel_name || "-"}</td>
-                    <td className="px-4 py-3">{task.video_length || "-"}</td>
-                    <td className="px-4 py-3 max-w-[200px] truncate">{task.required_actions || "-"}</td>
-                    <td className="px-4 py-3 text-emerald-400 font-medium">${Number(task.reward_amount).toFixed(2)}</td>
-                    <td className="px-4 py-3">{task.max_users}</td>
-                    <td className="px-4 py-3">{task.completed_count}</td>
-                    <td className="px-4 py-3">
+                  <tr key={task.id} className="hover:bg-white/5 text-xs sm:text-sm">
+                    <td className="px-3 sm:px-4 py-3 font-medium max-w-[120px] truncate">{task.channel_name || "-"}</td>
+                    <td className="px-3 sm:px-4 py-3 hidden sm:table-cell">{task.video_length || "-"}</td>
+                    <td className="px-3 sm:px-4 py-3 max-w-[100px] truncate hidden lg:table-cell text-xs">{task.required_actions || "-"}</td>
+                    <td className="px-3 sm:px-4 py-3 text-emerald-400 font-medium">${Number(task.reward_amount).toFixed(2)}</td>
+                    <td className="px-3 sm:px-4 py-3 hidden md:table-cell">{task.max_users}</td>
+                    <td className="px-3 sm:px-4 py-3">
                       <button onClick={() => toggleTask(task)}>
                         {task.is_enabled
-                          ? <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs text-emerald-400"><ToggleRight className="h-3 w-3" /> Active</span>
-                          : <span className="inline-flex items-center gap-1 rounded-full bg-red-500/10 px-2.5 py-0.5 text-xs text-red-400"><ToggleLeft className="h-3 w-3" /> Disabled</span>
+                          ? <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs text-emerald-400 whitespace-nowrap"><ToggleRight className="h-3 w-3" /> <span className="hidden sm:inline">Active</span></span>
+                          : <span className="inline-flex items-center gap-1 rounded-full bg-red-500/10 px-2 py-0.5 text-xs text-red-400 whitespace-nowrap"><ToggleLeft className="h-3 w-3" /> <span className="hidden sm:inline">Disabled</span></span>
                         }
                       </button>
                     </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-2">
+                    <td className="px-3 sm:px-4 py-3">
+                      <div className="flex items-center gap-1 justify-end">
                         <button onClick={() => editTask(task)} className="rounded-lg p-1.5 text-gray-400 hover:bg-white/10 hover:text-white">
                           <Pencil className="h-4 w-4" />
                         </button>
@@ -327,7 +325,7 @@ export default function AdminPage() {
                   </tr>
                 ))}
                 {tasks.length === 0 && (
-                  <tr><td colSpan={8} className="px-4 py-12 text-center text-gray-500">No tasks yet. Click &quot;Add Task&quot; to create one.</td></tr>
+                  <tr><td colSpan={7} className="px-3 sm:px-4 py-8 sm:py-12 text-center text-gray-500 text-xs sm:text-sm">No tasks yet. Click &quot;Add Task&quot; to create one.</td></tr>
                 )}
               </tbody>
             </table>

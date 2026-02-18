@@ -228,30 +228,30 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 text-white">
       {/* Navbar */}
-      <nav className="border-b border-white/10 px-6 py-4">
-        <div className="mx-auto flex max-w-6xl items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-500">
-              <Play className="h-5 w-5 text-white" fill="white" />
+      <nav className="border-b border-white/10 px-4 sm:px-6 py-3 sm:py-4">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 sm:gap-4">
+          <Link href="/" className="flex items-center gap-2 flex-shrink-0">
+            <div className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-lg bg-emerald-500">
+              <Play className="h-4 w-4 sm:h-5 sm:w-5 text-white" fill="white" />
             </div>
-            <span className="text-xl font-bold">WatchEarn</span>
+            <span className="text-lg sm:text-xl font-bold hidden sm:inline">WatchEarn</span>
           </Link>
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 rounded-lg bg-emerald-500/10 px-4 py-2">
-              <Wallet className="h-4 w-4 text-emerald-400" />
-              <span className="font-bold text-emerald-400">${Number(balance).toFixed(2)}</span>
+          <div className="flex items-center gap-2 sm:gap-4 ml-auto">
+            <div className="flex items-center gap-1 sm:gap-2 rounded-lg bg-emerald-500/10 px-2 sm:px-4 py-2">
+              <Wallet className="h-3 w-3 sm:h-4 sm:w-4 text-emerald-400" />
+              <span className="text-xs sm:text-sm font-bold text-emerald-400">${Number(balance).toFixed(2)}</span>
             </div>
-            <span className="text-sm text-gray-400">{user?.name}</span>
-            <button onClick={async () => { await logout(); router.push("/"); }} className="text-gray-400 hover:text-white">
-              <LogOut className="h-5 w-5" />
+            <span className="text-xs sm:text-sm text-gray-400 hidden sm:inline">{user?.name}</span>
+            <button onClick={async () => { await logout(); router.push("/"); }} className="text-gray-400 hover:text-white flex-shrink-0">
+              <LogOut className="h-4 w-4 sm:h-5 sm:w-5" />
             </button>
           </div>
         </div>
       </nav>
 
-      <div className="mx-auto max-w-6xl px-6 py-8">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 py-6 sm:py-8">
         {/* Tabs */}
-        <div className="mb-8 flex gap-1 rounded-xl bg-white/5 p-1">
+        <div className="mb-6 sm:mb-8 flex gap-1 rounded-xl bg-white/5 p-1 overflow-x-auto">
           {[
             { key: "tasks", label: "Available Tasks", icon: Play },
             { key: "ongoing", label: "Ongoing", icon: Clock },
@@ -261,12 +261,13 @@ export default function DashboardPage() {
             <button
               key={t.key}
               onClick={() => setTab(t.key as typeof tab)}
-              className={`flex flex-1 items-center justify-center gap-2 rounded-lg py-3 text-sm font-medium transition ${
+              className={`flex flex-1 items-center justify-center gap-1 sm:gap-2 rounded-lg py-2 sm:py-3 px-2 sm:px-3 text-xs sm:text-sm font-medium transition whitespace-nowrap ${
                 tab === t.key ? "bg-emerald-500 text-white" : "text-gray-400 hover:text-white"
               }`}
             >
-              <t.icon className="h-4 w-4" />
-              {t.label}
+              <t.icon className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+              <span className="hidden sm:inline">{t.label}</span>
+              <span className="sm:hidden">{t.label.split(' ')[0]}</span>
             </button>
           ))}
         </div>
@@ -275,13 +276,13 @@ export default function DashboardPage() {
         {tab === "tasks" && (
           <div>
             {available.length === 0 ? (
-              <div className="rounded-2xl border border-white/10 bg-white/5 p-12 text-center">
-                <Eye className="mx-auto mb-4 h-12 w-12 text-gray-600" />
-                <h3 className="text-lg font-semibold text-gray-400">No tasks available</h3>
-                <p className="text-sm text-gray-500">Check back later for new video tasks.</p>
+              <div className="rounded-2xl border border-white/10 bg-white/5 p-8 sm:p-12 text-center">
+                <Eye className="mx-auto mb-4 h-10 w-10 sm:h-12 sm:w-12 text-gray-600" />
+                <h3 className="text-base sm:text-lg font-semibold text-gray-400">No tasks available</h3>
+                <p className="text-xs sm:text-sm text-gray-500">Check back later for new video tasks.</p>
               </div>
             ) : (
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                 {available.map(task => (
                   <TaskCard key={task.id} task={task} onStart={() => startTask(task.id)} starting={startingTask === task.id} />
                 ))}
@@ -294,36 +295,37 @@ export default function DashboardPage() {
         {tab === "ongoing" && (
           <div>
             {ongoing.length === 0 ? (
-              <div className="rounded-2xl border border-white/10 bg-white/5 p-12 text-center">
-                <Clock className="mx-auto mb-4 h-12 w-12 text-gray-600" />
-                <h3 className="text-lg font-semibold text-gray-400">No ongoing tasks</h3>
-                <p className="text-sm text-gray-500">Start a task to see it here.</p>
+              <div className="rounded-2xl border border-white/10 bg-white/5 p-8 sm:p-12 text-center">
+                <Clock className="mx-auto mb-4 h-10 w-10 sm:h-12 sm:w-12 text-gray-600" />
+                <h3 className="text-base sm:text-lg font-semibold text-gray-400">No ongoing tasks</h3>
+                <p className="text-xs sm:text-sm text-gray-500">Start a task to see it here.</p>
               </div>
             ) : (
               <div className="space-y-3">
                 {ongoing.map(task => (
-                  <div key={task.id} className="flex items-center justify-between rounded-xl border border-white/10 bg-white/5 p-4">
-                    <div className="flex items-center gap-4">
-                      <div className="flex h-14 w-20 items-center justify-center rounded-lg bg-white/10">
+                  <div key={task.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between rounded-xl border border-white/10 bg-white/5 p-4 gap-3 sm:gap-4">
+                    <div className="flex items-center gap-3 w-full sm:w-auto">
+                      <div className="flex h-14 w-20 items-center justify-center rounded-lg bg-white/10 flex-shrink-0">
                         <Play className="h-5 w-5 text-gray-500" />
                       </div>
-                      <div>
-                        <div className="font-medium">{task.title || "Task"}</div>
+                      <div className="min-w-0">
+                        <div className="font-medium truncate">{task.title || "Task"}</div>
                         {task.channel_name && (
-                          <div className="text-sm text-gray-400">{task.channel_name}</div>
+                          <div className="text-xs sm:text-sm text-gray-400 truncate">{task.channel_name}</div>
                         )}
-                        <div className="text-sm text-gray-400">
+                        <div className="text-xs sm:text-sm text-gray-400">
                           {task.user_status?.completion_pct || 0}% completed
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2 w-full sm:w-auto">
                       <button
                         onClick={() => setActiveTask(task)}
-                        className="flex items-center gap-2 rounded-lg bg-emerald-500 px-4 py-2 text-sm font-semibold transition hover:bg-emerald-600"
+                        className="flex flex-1 sm:flex-initial items-center justify-center gap-2 rounded-lg bg-emerald-500 px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold transition hover:bg-emerald-600 whitespace-nowrap"
                       >
-                        <Eye className="h-4 w-4" />
-                        View Details
+                        <Eye className="h-3 w-3 sm:h-4 sm:w-4" />
+                        <span className="hidden sm:inline">View Details</span>
+                        <span className="sm:hidden">View</span>
                       </button>
                     </div>
                   </div>
@@ -337,38 +339,39 @@ export default function DashboardPage() {
         {tab === "completed" && (
           <div>
             {completed.length === 0 ? (
-              <div className="rounded-2xl border border-white/10 bg-white/5 p-12 text-center">
-                <CheckCircle className="mx-auto mb-4 h-12 w-12 text-gray-600" />
-                <h3 className="text-lg font-semibold text-gray-400">No completed tasks yet</h3>
-                <p className="text-sm text-gray-500">Start watching videos to earn!</p>
+              <div className="rounded-2xl border border-white/10 bg-white/5 p-8 sm:p-12 text-center">
+                <CheckCircle className="mx-auto mb-4 h-10 w-10 sm:h-12 sm:w-12 text-gray-600" />
+                <h3 className="text-base sm:text-lg font-semibold text-gray-400">No completed tasks yet</h3>
+                <p className="text-xs sm:text-sm text-gray-500">Start watching videos to earn!</p>
               </div>
             ) : (
               <div className="space-y-3">
                   {completed.map(task => (
-                    <div key={task.id} className="flex items-center justify-between rounded-xl border border-white/10 bg-white/5 p-4">
-                      <div className="flex items-center gap-4">
-                        <div className="flex h-14 w-20 items-center justify-center rounded-lg bg-white/10">
+                    <div key={task.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between rounded-xl border border-white/10 bg-white/5 p-4 gap-3 sm:gap-4">
+                      <div className="flex items-center gap-3 w-full sm:w-auto min-w-0">
+                        <div className="flex h-14 w-20 items-center justify-center rounded-lg bg-white/10 flex-shrink-0">
                           <Play className="h-5 w-5 text-gray-500" />
                         </div>
-                        <div>
-                        <div className="font-medium">{task.title || "Task"}</div>
+                        <div className="min-w-0">
+                        <div className="font-medium truncate">{task.title || "Task"}</div>
                         {task.channel_name && (
-                          <div className="text-sm text-gray-400">{task.channel_name}</div>
+                          <div className="text-xs sm:text-sm text-gray-400 truncate">{task.channel_name}</div>
                         )}
-                        <div className="text-sm text-gray-400">
+                        <div className="text-xs sm:text-sm text-gray-400">
                           {task.user_status?.completion_pct}% completed
                         </div>
                       </div>
                       </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 ml-auto">
                       {task.user_status?.status === "completed" ? (
-                        <span className="flex items-center gap-1 text-emerald-400">
-                          <CheckCircle className="h-4 w-4" />
-                          +${Number(task.user_status.earned_amount).toFixed(2)}
+                        <span className="flex items-center gap-1 text-emerald-400 text-sm">
+                          <CheckCircle className="h-4 w-4 flex-shrink-0" />
+                          <span className="hidden sm:inline">+${Number(task.user_status.earned_amount).toFixed(2)}</span>
+                          <span className="sm:hidden">${Number(task.user_status.earned_amount).toFixed(2)}</span>
                         </span>
                       ) : (
-                        <span className="flex items-center gap-1 text-red-400">
-                          <XCircle className="h-4 w-4" />
+                        <span className="flex items-center gap-1 text-red-400 text-sm">
+                          <XCircle className="h-4 w-4 flex-shrink-0" />
                           Failed
                         </span>
                       )}
@@ -383,14 +386,14 @@ export default function DashboardPage() {
         {/* Withdraw */}
         {tab === "withdraw" && (
           <div>
-            <div className="mb-6 flex items-center justify-between">
+            <div className="mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div>
-                <div className="text-sm text-gray-400">Available Balance</div>
-                <div className="text-3xl font-bold text-emerald-400">${Number(balance).toFixed(2)}</div>
+                <div className="text-xs sm:text-sm text-gray-400">Available Balance</div>
+                <div className="text-2xl sm:text-3xl font-bold text-emerald-400">${Number(balance).toFixed(2)}</div>
               </div>
               <button
                 onClick={() => setShowWithdrawForm(!showWithdrawForm)}
-                className="flex items-center gap-2 rounded-lg bg-emerald-500 px-5 py-2.5 font-semibold transition hover:bg-emerald-600"
+                className="flex items-center gap-2 rounded-lg bg-emerald-500 px-4 sm:px-5 py-2 sm:py-2.5 font-semibold transition hover:bg-emerald-600 text-sm whitespace-nowrap"
               >
                 {showWithdrawForm ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                 Request Withdrawal
@@ -398,9 +401,9 @@ export default function DashboardPage() {
             </div>
 
             {showWithdrawForm && (
-              <form onSubmit={submitWithdrawal} className="mb-6 rounded-xl border border-white/10 bg-white/5 p-6 space-y-4">
+              <form onSubmit={submitWithdrawal} className="mb-6 rounded-xl border border-white/10 bg-white/5 p-4 sm:p-6 space-y-4">
                 <div>
-                  <label className="mb-1.5 block text-sm font-medium text-gray-300">Amount ($)</label>
+                  <label className="mb-1.5 block text-xs sm:text-sm font-medium text-gray-300">Amount ($)</label>
                   <input
                     type="number"
                     step="0.01"
@@ -409,17 +412,17 @@ export default function DashboardPage() {
                     required
                     value={wAmount}
                     onChange={e => setWAmount(e.target.value)}
-                    className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-white outline-none focus:border-emerald-500"
+                    className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-white outline-none focus:border-emerald-500 text-sm"
                     placeholder="0.00"
                   />
                 </div>
                 <div>
-                  <label className="mb-1.5 block text-sm font-medium text-gray-300">Payment Method</label>
+                  <label className="mb-1.5 block text-xs sm:text-sm font-medium text-gray-300">Payment Method</label>
                   <select
                     value={wMethod}
                     onChange={e => setWMethod(e.target.value)}
                     required
-                    className="w-full rounded-lg border border-white/10 bg-gray-900 px-4 py-3 text-white outline-none focus:border-emerald-500"
+                    className="w-full rounded-lg border border-white/10 bg-gray-900 px-4 py-2.5 text-white outline-none focus:border-emerald-500 text-sm"
                   >
                     <option value="">Select method</option>
                     <option value="paypal">PayPal</option>
@@ -428,19 +431,19 @@ export default function DashboardPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="mb-1.5 block text-sm font-medium text-gray-300">Payment Details</label>
+                  <label className="mb-1.5 block text-xs sm:text-sm font-medium text-gray-300">Payment Details</label>
                   <input
                     type="text"
                     required
                     value={wDetails}
                     onChange={e => setWDetails(e.target.value)}
-                    className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-white outline-none focus:border-emerald-500"
+                    className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-white outline-none focus:border-emerald-500 text-sm"
                     placeholder="PayPal email, wallet address, etc."
                   />
                 </div>
                 <button
                   type="submit"
-                  className="w-full rounded-lg bg-emerald-500 py-3 font-semibold transition hover:bg-emerald-600"
+                  className="w-full rounded-lg bg-emerald-500 py-2.5 sm:py-3 font-semibold transition hover:bg-emerald-600 text-sm"
                 >
                   Submit Withdrawal
                 </button>
@@ -449,20 +452,20 @@ export default function DashboardPage() {
 
             <div className="space-y-3">
               {withdrawals.length === 0 ? (
-                <div className="rounded-2xl border border-white/10 bg-white/5 p-12 text-center">
-                  <DollarSign className="mx-auto mb-4 h-12 w-12 text-gray-600" />
-                  <h3 className="text-lg font-semibold text-gray-400">No withdrawals yet</h3>
+                <div className="rounded-2xl border border-white/10 bg-white/5 p-8 sm:p-12 text-center">
+                  <DollarSign className="mx-auto mb-4 h-10 w-10 sm:h-12 sm:w-12 text-gray-600" />
+                  <h3 className="text-base sm:text-lg font-semibold text-gray-400">No withdrawals yet</h3>
                 </div>
               ) : (
                 withdrawals.map(w => (
-                  <div key={w.id} className="flex items-center justify-between rounded-xl border border-white/10 bg-white/5 p-4">
+                  <div key={w.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between rounded-xl border border-white/10 bg-white/5 p-4 gap-3 sm:gap-4">
                     <div>
                       <div className="font-medium">${Number(w.amount).toFixed(2)}</div>
-                      <div className="text-sm text-gray-400">
+                      <div className="text-xs sm:text-sm text-gray-400">
                         {w.payment_method} &middot; {new Date(w.created_at).toLocaleDateString()}
                       </div>
                     </div>
-                    <span className={`rounded-full px-3 py-1 text-xs font-medium ${
+                    <span className={`rounded-full px-3 py-1 text-xs font-medium flex-shrink-0 ${
                       w.status === "approved" ? "bg-emerald-500/10 text-emerald-400" :
                       w.status === "rejected" ? "bg-red-500/10 text-red-400" :
                       "bg-amber-500/10 text-amber-400"
