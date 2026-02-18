@@ -5,7 +5,8 @@ import sharp from "sharp";
 
 export async function POST(req: NextRequest) {
   try {
-    await requireAdmin();
+    const admin = await requireAdmin();
+    console.log("[v0] Upload requested by admin:", admin.email, "role:", admin.role);
     
     const formData = await req.formData();
     const file = formData.get("file") as File;
