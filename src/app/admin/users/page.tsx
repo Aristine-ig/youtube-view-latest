@@ -6,8 +6,7 @@ import { useEffect, useState, useCallback } from "react";
 import { toast } from "sonner";
 import Link from "next/link";
 import {
-  Play, LogOut, LayoutDashboard, ListVideo, Users, ArrowDownToLine, ShieldBan, ShieldCheck,
-  TrendingUp, TrendingDown, AlertTriangle, Clock, DollarSign, CheckCircle
+  Play, LogOut, LayoutDashboard, Users, ArrowDownToLine, ShieldBan, ShieldCheck
 } from "lucide-react";
 
 interface User {
@@ -20,22 +19,10 @@ interface User {
   created_at: string;
 }
 
-interface Analytics {
-  totalUsers: number;
-  activeUsers: number;
-  suspendedUsers: number;
-  totalEarned: number;
-  totalApprovedAmount: number;
-  completionRate: number;
-  dropOffRate: number;
-  fraudFlags: number;
-}
-
 export default function AdminUsersPage() {
   const { user, loading: authLoading, logout } = useAuth();
   const router = useRouter();
   const [users, setUsers] = useState<User[]>([]);
-  const [analytics, setAnalytics] = useState<Analytics | null>(null);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -50,19 +37,11 @@ export default function AdminUsersPage() {
     }
   }, [page]);
 
-  const fetchAnalytics = useCallback(async () => {
-    const res = await fetch("/api/admin/analytics");
-    if (res.ok) {
-      const data = await res.json();
-      setAnalytics(data);
-    }
-  }, []);
-
   useEffect(() => {
     if (authLoading) return;
     if (!user || user.role !== "admin") { router.push("/login"); return; }
-    Promise.all([fetchUsers(), fetchAnalytics()]).finally(() => setLoading(false));
-  }, [user, authLoading, router, fetchUsers, fetchAnalytics, page]);
+    fetchUsers().finally(() => setLoading(false));
+  }, [user, authLoading, router, fetchUsers, page]);
 
   const toggleStatus = async (u: User) => {
     const newStatus = u.status === "active" ? "suspended" : "active";
@@ -101,9 +80,6 @@ export default function AdminUsersPage() {
             <Link href="/admin" className="flex items-center gap-1 rounded-lg px-2 sm:px-3 py-2 text-xs sm:text-sm text-gray-400 hover:bg-white/5 hover:text-white whitespace-nowrap">
               <LayoutDashboard className="h-3 w-3 sm:h-4 sm:w-4" /> <span className="hidden sm:inline">Dashboard</span>
             </Link>
-            <Link href="/admin/tasks" className="flex items-center gap-1 rounded-lg px-2 sm:px-3 py-2 text-xs sm:text-sm text-gray-400 hover:bg-white/5 hover:text-white whitespace-nowrap">
-              <ListVideo className="h-3 w-3 sm:h-4 sm:w-4" /> <span className="hidden sm:inline">Tasks</span>
-            </Link>
             <Link href="/admin/users" className="flex items-center gap-1 rounded-lg bg-white/10 px-2 sm:px-3 py-2 text-xs sm:text-sm text-white whitespace-nowrap">
               <Users className="h-3 w-3 sm:h-4 sm:w-4" /> <span className="hidden sm:inline">Users</span>
             </Link>
@@ -118,23 +94,6 @@ export default function AdminUsersPage() {
       </nav>
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 py-6 sm:py-8">
-        {/* Analytics Section */}
-        <div className="mb-10">
-          <div className="mb-6 flex items-center gap-3">
-            <LayoutDashboard className="h-5 w-5 sm:h-6 sm:w-6 text-emerald-400" />
-            <h1 className="text-xl sm:text-2xl font-bold">Analytics Dashboard</h1>
-          </div>
-
-          {analytics && (
-            <div className="grid gap-3 sm:gap-4 grid-cols-2 sm:grid-cols-2 lg:grid-cols-4">
-              <StatCard icon={Users} label="Total Users" value={analytics.totalUsers} sub={`${analytics.activeUsers} active, ${analytics.suspendedUsers} suspended`} />
-              <StatCard icon={CheckCircle} label="Total Earned" value={`$${analytics.totalEarned}`} sub={`$${analytics.totalApprovedAmount} withdrawn`} color="emerald" />
-              <StatCard icon={TrendingUp} label="Completion Rate" value={`${analytics.completionRate}%`} sub="of started tasks" color="emerald" />
-              <StatCard icon={AlertTriangle} label="Fraud Flags" value={analytics.fraudFlags} sub="suspicious activities" color="red" />
-            </div>
-          )}
-        </div>
-
         {/* Users Table Section */}
         <div>
           <h2 className="mb-6 text-xl sm:text-2xl font-bold">Manage Users</h2>
@@ -210,31 +169,6 @@ export default function AdminUsersPage() {
           </div>
         </div>
       </div>
-    </div>
-  );
-}
-
-function StatCard({ icon: Icon, label, value, sub, color = "white" }: {
-  icon: React.ElementType;
-  label: string;
-  value: string | number;
-  sub: string;
-  color?: string;
-}) {
-  const colorMap: Record<string, string> = {
-    white: "text-white",
-    emerald: "text-emerald-400",
-    amber: "text-amber-400",
-    red: "text-red-400",
-  };
-  return (
-    <div className="rounded-xl border border-white/10 bg-white/5 p-4 sm:p-5">
-      <div className="mb-2 sm:mb-3 flex items-center gap-2 text-gray-400">
-        <Icon className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
-        <span className="text-xs sm:text-sm">{label}</span>
-      </div>
-      <div className={`text-lg sm:text-2xl font-bold ${colorMap[color]}`}>{value}</div>
-      <div className="mt-1 text-xs text-gray-500">{sub}</div>
     </div>
   );
 }
