@@ -46,6 +46,7 @@ interface Task {
 const emptyForm = {
   channel_name: "",
   title: "",
+  video_thumbnail: "",
   video_length: "",
   required_actions: "",
   reward_amount: "",
@@ -62,6 +63,7 @@ export default function AdminPage() {
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const fetchAnalytics = useCallback(async () => {
     const res = await fetch("/api/admin/analytics");
@@ -84,6 +86,48 @@ export default function AdminPage() {
     if (!user || user.role !== "admin") { router.push("/login"); return; }
     Promise.all([fetchAnalytics(), fetchTasks()]).finally(() => setLoading(false));
   }, [user, authLoading, router, fetchAnalytics, fetchTasks]);
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Create preview
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImagePreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+
+    // Upload to Supabase storage
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/upload", { method: "POST", body: formData });
+      if (res.ok) {
+        const data = await res.json();
+        setForm({ ...form, video_thumbnail: data.url });
+        toast.success("Image uploaded");
+      } else {
+        toast.error("Upload failed");
+      }
+    } catch (err) {
+      toast.error("Upload error");
+    }
+  };
+
+  const handleFormOpen = () => {
+    setShowForm(true);
+    setEditingId(null);
+    setForm(emptyForm);
+    setImagePreview(null);
+  };
+
+  const handleFormClose = () => {
+    setShowForm(false);
+    setEditingId(null);
+    setForm(emptyForm);
+    setImagePreview(null);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -144,12 +188,14 @@ export default function AdminPage() {
     setForm({
       channel_name: task.channel_name || "",
       title: task.title || "",
+      video_thumbnail: task.video_thumbnail || "",
       video_length: task.video_length || "",
       required_actions: task.required_actions || "",
       reward_amount: String(task.reward_amount),
       max_users: String(task.max_users),
       is_enabled: task.is_enabled,
     });
+    setImagePreview(task.video_thumbnail || null);
     setShowForm(true);
   };
 
@@ -222,7 +268,7 @@ export default function AdminPage() {
               <h2 className="text-xl sm:text-2xl font-bold">Manage Tasks</h2>
             </div>
             <button
-              onClick={() => { setShowForm(true); setEditingId(null); setForm(emptyForm); }}
+              onClick={handleFormOpen}
               className="flex items-center gap-2 rounded-lg bg-emerald-500 px-4 py-2.5 text-xs sm:text-sm font-semibold transition hover:bg-emerald-600 whitespace-nowrap flex-shrink-0"
             >
               <Plus className="h-4 w-4" /> <span className="hidden sm:inline">Add Task</span><span className="sm:hidden">Add</span>
@@ -235,7 +281,7 @@ export default function AdminPage() {
               <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl border border-white/10 bg-gray-900 p-6">
                 <div className="mb-4 flex items-center justify-between">
                   <h2 className="text-xl font-bold">{editingId ? "Edit Task" : "Add New Task"}</h2>
-                  <button onClick={() => { setShowForm(false); setEditingId(null); setForm(emptyForm); }}>
+                  <button onClick={handleFormClose}>
                     <X className="h-5 w-5 text-gray-400 hover:text-white" />
                   </button>
                 </div>
