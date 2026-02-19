@@ -416,13 +416,7 @@ export default function DashboardPage() {
                   className="group relative flex items-center gap-1.5 rounded-full bg-gradient-to-br from-amber-500/20 to-amber-600/20 hover:from-amber-500/30 hover:to-amber-600/30 border border-amber-500/30 hover:border-amber-400/50 px-3 py-1.5 transition-all duration-200 hover:shadow-lg hover:shadow-amber-500/20 hover:scale-105"
                   aria-label="Important warning"
                 >
-                  <div className="relative">
-                    <AlertTriangle className="h-4 w-4 text-amber-400 group-hover:text-amber-300 transition-colors" />
-                    <span className="absolute -top-0.5 -right-0.5 flex h-2 w-2">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
-                    </span>
-                  </div>
+                  <AlertTriangle className="h-4 w-4 text-amber-400 group-hover:text-amber-300 transition-colors" />
                   <span className="text-xs font-medium text-amber-300 group-hover:text-amber-200 transition-colors hidden sm:inline">Warning</span>
                 </button>
               </PopoverTrigger>
