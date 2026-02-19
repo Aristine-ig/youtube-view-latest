@@ -6,7 +6,7 @@ import { useEffect, useState, useCallback, useMemo } from "react";
 import { toast } from "sonner";
 import {
   Play, DollarSign, CheckCircle, Clock, LogOut, ArrowDownToLine,
-  XCircle, Wallet, ChevronDown, ChevronUp, Eye, X, Send
+  XCircle, Wallet, ChevronDown, ChevronUp, Eye, X, Send, Info, AlertTriangle
 } from "lucide-react";
 import Link from "next/link";
 import {
@@ -19,6 +19,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 interface Task {
   id: string;
@@ -405,6 +410,36 @@ export default function DashboardPage() {
             <span className="text-lg sm:text-xl font-bold hidden sm:inline">WatchEarn</span>
           </Link>
           <div className="flex items-center gap-2 sm:gap-4 ml-auto">
+            <Popover>
+              <PopoverTrigger asChild>
+                <button 
+                  className="flex items-center justify-center rounded-full bg-amber-500/10 hover:bg-amber-500/20 p-2 transition-colors"
+                  aria-label="Important warning"
+                >
+                  <Info className="h-4 w-4 text-amber-400" />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className="w-80 bg-gray-900 border-amber-500/20 text-white p-0 overflow-hidden">
+                <div className="bg-amber-500/10 border-b border-amber-500/20 px-4 py-3 flex items-center gap-2">
+                  <AlertTriangle className="h-5 w-5 text-amber-400" />
+                  <h3 className="font-semibold text-amber-400">Important User Warning</h3>
+                </div>
+                <div className="p-4 space-y-3 text-sm text-gray-300">
+                  <p className="flex items-start gap-2">
+                    <span className="text-emerald-400 mt-0.5">•</span>
+                    <span>Rewards will only be credited for <strong className="text-white">genuine, complete, and verified</strong> video views.</span>
+                  </p>
+                  <p className="flex items-start gap-2">
+                    <span className="text-red-400 mt-0.5">•</span>
+                    <span>Use of <strong className="text-white">bots, scripts, automation tools, or artificial engagement</strong> is strictly prohibited.</span>
+                  </p>
+                  <p className="flex items-start gap-2">
+                    <span className="text-red-400 mt-0.5">•</span>
+                    <span>Accounts involved in suspicious or unfair activity will be <strong className="text-white">permanently banned</strong>.</span>
+                  </p>
+                </div>
+              </PopoverContent>
+            </Popover>
             <div className="flex items-center gap-1 sm:gap-2 rounded-lg bg-emerald-500/10 px-2 sm:px-4 py-2">
               <Wallet className="h-3 w-3 sm:h-4 sm:w-4 text-emerald-400" />
               <span className="text-xs sm:text-sm font-bold text-emerald-400">${Number(balance).toFixed(2)}</span>
