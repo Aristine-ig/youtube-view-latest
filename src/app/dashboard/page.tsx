@@ -163,8 +163,11 @@ export default function DashboardPage() {
           toast.error("Failed to upload screenshot");
         }
       }
+      const uploadedCount = newScreenshots.length - screenshots.length;
       setScreenshots(newScreenshots);
-      toast.success(`${newScreenshots.length - screenshots.length} screenshot(s) uploaded`);
+      if (uploadedCount > 0) {
+        toast.success(`${uploadedCount} screenshot(s) uploaded`);
+      }
     } catch (err) {
       toast.error("Failed to upload screenshots");
     } finally {
