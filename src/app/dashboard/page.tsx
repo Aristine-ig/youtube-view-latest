@@ -462,7 +462,7 @@ export default function DashboardPage() {
                     </p>
                   </div>
                 </div>
-                <div className="bg-amber-500/5 border-t border-amber-500/20 px-5 py-3 text-center">
+                <div className="bg-amber-500/5 border-t border-amber-400/20 px-5 py-3 text-center">
                   <p className="text-xs text-amber-400/80 font-medium">Stay compliant to keep earning rewards</p>
                 </div>
               </PopoverContent>
@@ -855,8 +855,8 @@ function WithdrawSection({
                 </div>
               </div>
               <span className={`rounded-full px-3 py-1 text-xs font-medium flex-shrink-0 ${w.status === "approved" ? "bg-emerald-500/10 text-emerald-400" :
-                  w.status === "rejected" ? "bg-red-500/10 text-red-400" :
-                    "bg-amber-500/10 text-amber-400"
+                w.status === "rejected" ? "bg-red-500/10 text-red-400" :
+                  "bg-amber-500/10 text-amber-400"
                 }`}>
                 {w.status === "pending" && <Clock className="mr-1 inline h-3 w-3" />}
                 {w.status.charAt(0).toUpperCase() + w.status.slice(1)}
