@@ -413,30 +413,57 @@ export default function DashboardPage() {
             <Popover>
               <PopoverTrigger asChild>
                 <button 
-                  className="flex items-center justify-center rounded-full bg-amber-500/10 hover:bg-amber-500/20 p-2 transition-colors"
+                  className="group relative flex items-center gap-1.5 rounded-full bg-gradient-to-br from-amber-500/20 to-amber-600/20 hover:from-amber-500/30 hover:to-amber-600/30 border border-amber-500/30 hover:border-amber-400/50 px-3 py-1.5 transition-all duration-200 hover:shadow-lg hover:shadow-amber-500/20 hover:scale-105"
                   aria-label="Important warning"
                 >
-                  <Info className="h-4 w-4 text-amber-400" />
+                  <div className="relative">
+                    <AlertTriangle className="h-4 w-4 text-amber-400 group-hover:text-amber-300 transition-colors" />
+                    <span className="absolute -top-0.5 -right-0.5 flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+                    </span>
+                  </div>
+                  <span className="text-xs font-medium text-amber-300 group-hover:text-amber-200 transition-colors hidden sm:inline">Warning</span>
                 </button>
               </PopoverTrigger>
-              <PopoverContent className="w-80 bg-gray-900 border-amber-500/20 text-white p-0 overflow-hidden">
-                <div className="bg-amber-500/10 border-b border-amber-500/20 px-4 py-3 flex items-center gap-2">
-                  <AlertTriangle className="h-5 w-5 text-amber-400" />
-                  <h3 className="font-semibold text-amber-400">Important User Warning</h3>
+              <PopoverContent 
+                className="w-80 sm:w-96 bg-gradient-to-br from-gray-900 via-gray-900 to-gray-950 border-amber-500/30 shadow-xl shadow-amber-500/10 text-white p-0 overflow-hidden"
+                sideOffset={8}
+              >
+                <div className="bg-gradient-to-r from-amber-500/20 via-amber-600/20 to-orange-500/20 border-b border-amber-500/30 px-4 py-3.5 flex items-center gap-3">
+                  <div className="flex items-center justify-center rounded-lg bg-amber-500/20 p-2 border border-amber-400/30">
+                    <AlertTriangle className="h-5 w-5 text-amber-300" />
+                  </div>
+                  <h3 className="font-bold text-base text-amber-200">Important User Warning</h3>
                 </div>
-                <div className="p-4 space-y-3 text-sm text-gray-300">
-                  <p className="flex items-start gap-2">
-                    <span className="text-emerald-400 mt-0.5">•</span>
-                    <span>Rewards will only be credited for <strong className="text-white">genuine, complete, and verified</strong> video views.</span>
-                  </p>
-                  <p className="flex items-start gap-2">
-                    <span className="text-red-400 mt-0.5">•</span>
-                    <span>Use of <strong className="text-white">bots, scripts, automation tools, or artificial engagement</strong> is strictly prohibited.</span>
-                  </p>
-                  <p className="flex items-start gap-2">
-                    <span className="text-red-400 mt-0.5">•</span>
-                    <span>Accounts involved in suspicious or unfair activity will be <strong className="text-white">permanently banned</strong>.</span>
-                  </p>
+                <div className="p-5 space-y-4">
+                  <div className="flex items-start gap-3 group/item">
+                    <div className="flex items-center justify-center h-6 w-6 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex-shrink-0 mt-0.5">
+                      <CheckCircle className="h-3.5 w-3.5 text-emerald-400" />
+                    </div>
+                    <p className="text-sm text-gray-300 leading-relaxed">
+                      Rewards will only be credited for <strong className="text-emerald-300">genuine, complete, and verified</strong> video views.
+                    </p>
+                  </div>
+                  <div className="flex items-start gap-3 group/item">
+                    <div className="flex items-center justify-center h-6 w-6 rounded-full bg-red-500/10 border border-red-500/30 flex-shrink-0 mt-0.5">
+                      <XCircle className="h-3.5 w-3.5 text-red-400" />
+                    </div>
+                    <p className="text-sm text-gray-300 leading-relaxed">
+                      Use of <strong className="text-red-300">bots, scripts, automation tools, or artificial engagement</strong> is strictly prohibited.
+                    </p>
+                  </div>
+                  <div className="flex items-start gap-3 group/item">
+                    <div className="flex items-center justify-center h-6 w-6 rounded-full bg-red-500/10 border border-red-500/30 flex-shrink-0 mt-0.5">
+                      <XCircle className="h-3.5 w-3.5 text-red-400" />
+                    </div>
+                    <p className="text-sm text-gray-300 leading-relaxed">
+                      Accounts involved in suspicious or unfair activity will be <strong className="text-red-300">permanently banned</strong>.
+                    </p>
+                  </div>
+                </div>
+                <div className="bg-amber-500/5 border-t border-amber-500/20 px-5 py-3 text-center">
+                  <p className="text-xs text-amber-400/80 font-medium">Stay compliant to keep earning rewards</p>
                 </div>
               </PopoverContent>
             </Popover>
