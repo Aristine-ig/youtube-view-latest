@@ -175,6 +175,11 @@ export default function DashboardPage() {
                   <XCircle className="h-6 w-6" />
                 </button>
               </div>
+              {activeTask.video_thumbnail && (
+                <div className="mb-6 rounded-xl overflow-hidden border border-white/10">
+                  <img src={activeTask.video_thumbnail} alt={activeTask.title} className="w-full h-64 object-cover" />
+                </div>
+              )}
               <div className="mb-6 grid grid-cols-2 gap-4 rounded-xl bg-white/5 p-4">
                 <div>
                   <div className="text-sm text-gray-400">Reward</div>
