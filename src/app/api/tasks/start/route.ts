@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
 
     // Check if already started
     const { data: existing } = await supabase
-      .from("task_completions")
+      .from("screenshot_verify")
       .select("id")
       .eq("task_id", task_id)
       .eq("user_id", user.id)
@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
     }
 
     const { data, error } = await supabase
-      .from("task_completions")
+      .from("screenshot_verify")
       .insert({ 
         task_id, 
         user_id: user.id, 
