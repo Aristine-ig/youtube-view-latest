@@ -2,7 +2,7 @@
 
 import { useAuth } from "@/components/auth-provider";
 import { useRouter } from "next/navigation";
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import { toast } from "sonner";
 import {
   Play, DollarSign, CheckCircle, Clock, LogOut, ArrowDownToLine,
@@ -71,6 +71,9 @@ export default function DashboardPage() {
   const [uploadingScreenshots, setUploadingScreenshots] = useState(false);
   const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
   const [selectedCompletionPct, setSelectedCompletionPct] = useState<number | null>(null);
+  const [timeRemaining, setTimeRemaining] = useState<number>(0);
+  const [taskStartTime, setTaskStartTime] = useState<number | null>(null);
+  const timerIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const fetchTasks = useCallback(async () => {
     try {
@@ -253,10 +256,57 @@ export default function DashboardPage() {
     }
   };
 
-  const handleLogout = useCallback(async () => {
-    await logout();
-    router.push("/");
-  }, [logout, router]);
+  useEffect(() => {
+    if (activeTask && activeTask.video_length) {
+      // Parse video length (e.g., "5 minutes" or "10:30" or "10 min")
+      let totalSeconds = 0;
+      const lengthStr = activeTask.video_length.toLowerCase().trim();
+      
+      if (lengthStr.includes(':')) {
+        const parts = lengthStr.split(':').map(p => parseInt(p));
+        if (parts.length === 2) {
+          totalSeconds = parts[0] * 60 + parts[1];
+        } else if (parts.length === 3) {
+          totalSeconds = parts[0] * 3600 + parts[1] * 60 + parts[2];
+        }
+      } else if (lengthStr.includes('minute') || lengthStr.includes('min')) {
+        const match = lengthStr.match(/(\d+)/);
+        if (match) totalSeconds = parseInt(match[1]) * 60;
+      } else if (lengthStr.includes('hour') || lengthStr.includes('hr')) {
+        const match = lengthStr.match(/(\d+)/);
+        if (match) totalSeconds = parseInt(match[1]) * 3600;
+      } else if (lengthStr.includes('second') || lengthStr.includes('sec')) {
+        const match = lengthStr.match(/(\d+)/);
+        if (match) totalSeconds = parseInt(match[1]);
+      }
+
+      const now = Date.now();
+      setTaskStartTime(now);
+      setTimeRemaining(totalSeconds);
+
+      if (timerIntervalRef.current) {
+        clearInterval(timerIntervalRef.current);
+      }
+
+      timerIntervalRef.current = setInterval(() => {
+        const elapsed = (Date.now() - now) / 1000;
+        const remaining = Math.max(0, totalSeconds - Math.floor(elapsed));
+        setTimeRemaining(remaining);
+
+        if (remaining === 0) {
+          clearInterval(timerIntervalRef.current!);
+          toast.error("Task time expired! You need to perform the task again.");
+          setActiveTask(null);
+        }
+      }, 100);
+    }
+
+    return () => {
+      if (timerIntervalRef.current) {
+        clearInterval(timerIntervalRef.current);
+      }
+    };
+  }, [activeTask]);
 
   // Memoize tab configuration
   const tabs = useMemo(() => [
@@ -329,6 +379,28 @@ export default function DashboardPage() {
                     <div className="font-medium">{activeTask.video_length}</div>
                   </div>
                 )}
+              </div>
+
+              {/* Timer Display */}
+              <div className="mb-6 rounded-xl bg-red-500/10 border border-red-500/30 p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="text-sm text-gray-400 mb-1">Time Remaining</div>
+                    <div className="flex items-center gap-2">
+                      <Clock className="h-5 w-5 text-red-400" />
+                      <div className="text-2xl font-bold font-mono text-red-400">
+                        {Math.floor(timeRemaining / 60)}:{String(Math.floor(timeRemaining % 60)).padStart(2, '0')}
+                      </div>
+                    </div>
+                  </div>
+                  <div className={`text-xs font-semibold px-3 py-1 rounded-full ${
+                    timeRemaining < 60 
+                      ? 'bg-red-500/20 text-red-300' 
+                      : 'bg-amber-500/20 text-amber-300'
+                  }`}>
+                    {timeRemaining < 60 ? 'Hurry!' : 'In Progress'}
+                  </div>
+                </div>
               </div>
               {activeTask.keywords && (
                 <div className="mb-6 rounded-xl bg-white/5 p-4">
