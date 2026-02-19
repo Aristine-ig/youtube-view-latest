@@ -6,7 +6,7 @@ import { useEffect, useState, useCallback } from "react";
 import { toast } from "sonner";
 import {
   Play, DollarSign, CheckCircle, Clock, LogOut, ArrowDownToLine,
-  XCircle, Wallet, ChevronDown, ChevronUp, Eye
+  XCircle, Wallet, ChevronDown, ChevronUp, Eye, X
 } from "lucide-react";
 import Link from "next/link";
 
