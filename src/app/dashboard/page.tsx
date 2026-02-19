@@ -2,7 +2,7 @@
 
 import { useAuth } from "@/components/auth-provider";
 import { useRouter } from "next/navigation";
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import { toast } from "sonner";
 import {
   Play, DollarSign, CheckCircle, Clock, LogOut, ArrowDownToLine,
@@ -71,6 +71,9 @@ export default function DashboardPage() {
   const [uploadingScreenshots, setUploadingScreenshots] = useState(false);
   const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
   const [selectedCompletionPct, setSelectedCompletionPct] = useState<number | null>(null);
+  const [timeRemaining, setTimeRemaining] = useState<number>(0);
+  const [taskStartTime, setTaskStartTime] = useState<number | null>(null);
+  const timerIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const fetchTasks = useCallback(async () => {
     try {
@@ -258,6 +261,89 @@ export default function DashboardPage() {
     router.push("/");
   }, [logout, router]);
 
+  // Parse video length and convert to seconds
+  const parseVideoLength = (lengthStr: string | number): number => {
+    if (!lengthStr) return 90; // Default 1:30 buffer
+    
+    // Convert to string if it's a number
+    const str = typeof lengthStr === 'number' ? String(lengthStr) : lengthStr;
+    const lower = str.toLowerCase().trim();
+    let totalSeconds = 0;
+
+    // Handle HH:MM:SS or MM:SS format
+    if (lower.includes(':')) {
+      const parts = lower.split(':').map(p => parseInt(p.trim()) || 0);
+      if (parts.length === 3) {
+        totalSeconds = parts[0] * 3600 + parts[1] * 60 + parts[2];
+      } else if (parts.length === 2) {
+        totalSeconds = parts[0] * 60 + parts[1];
+      }
+    } 
+    // Handle "X minutes" or "X min"
+    else if (lower.includes('minute') || lower.includes('min')) {
+      const match = lower.match(/(\d+)/);
+      if (match) totalSeconds = parseInt(match[1]) * 60;
+    } 
+    // Handle "X hours" or "X hr"
+    else if (lower.includes('hour') || lower.includes('hr')) {
+      const match = lower.match(/(\d+)/);
+      if (match) totalSeconds = parseInt(match[1]) * 3600;
+    }
+    // Handle "X seconds" or "X sec"
+    else if (lower.includes('second') || lower.includes('sec')) {
+      const match = lower.match(/(\d+)/);
+      if (match) totalSeconds = parseInt(match[1]);
+    }
+    // Just a number, assume minutes
+    else {
+      const match = lower.match(/(\d+)/);
+      if (match) totalSeconds = parseInt(match[1]) * 60;
+    }
+
+    // Add 1 minute 30 seconds buffer
+    return totalSeconds + 90;
+  };
+
+  // Timer effect for active task
+  useEffect(() => {
+    if (activeTask && activeTask.video_length) {
+      console.log("[v0] Starting timer for task:", activeTask.id, "video_length:", activeTask.video_length);
+      const totalSeconds = parseVideoLength(activeTask.video_length);
+      console.log("[v0] Parsed total seconds:", totalSeconds);
+      const startTime = Date.now();
+      
+      setTaskStartTime(startTime);
+      setTimeRemaining(totalSeconds);
+
+      if (timerIntervalRef.current) {
+        clearInterval(timerIntervalRef.current);
+      }
+
+      timerIntervalRef.current = setInterval(() => {
+        const elapsed = Math.floor((Date.now() - startTime) / 1000);
+        const remaining = Math.max(0, totalSeconds - elapsed);
+        setTimeRemaining(remaining);
+
+        if (remaining === 0) {
+          if (timerIntervalRef.current) {
+            clearInterval(timerIntervalRef.current);
+          }
+          toast.error("Task time expired! Please start the task again.");
+          setActiveTask(null);
+          setScreenshots([]);
+          fetchTasks();
+        }
+      }, 1000);
+    }
+
+    return () => {
+      if (timerIntervalRef.current) {
+        clearInterval(timerIntervalRef.current);
+        timerIntervalRef.current = null;
+      }
+    };
+  }, [activeTask, fetchTasks]);
+
   // Memoize tab configuration
   const tabs = useMemo(() => [
     { key: "tasks" as const, label: "Available Tasks", icon: Play },
@@ -330,6 +416,57 @@ export default function DashboardPage() {
                   </div>
                 )}
               </div>
+
+              {/* Timer Display */}
+              <div className={`mb-6 rounded-xl border p-4 ${
+                timeRemaining < 60 
+                  ? 'bg-red-500/10 border-red-500/30' 
+                  : timeRemaining < 180 
+                    ? 'bg-amber-500/10 border-amber-500/30'
+                    : 'bg-emerald-500/10 border-emerald-500/30'
+              }`}>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className={`flex items-center justify-center rounded-lg p-2 ${
+                      timeRemaining < 60 
+                        ? 'bg-red-500/20' 
+                        : timeRemaining < 180 
+                          ? 'bg-amber-500/20'
+                          : 'bg-emerald-500/20'
+                    }`}>
+                      <Clock className={`h-5 w-5 ${
+                        timeRemaining < 60 
+                          ? 'text-red-400' 
+                          : timeRemaining < 180 
+                            ? 'text-amber-400'
+                            : 'text-emerald-400'
+                      }`} />
+                    </div>
+                    <div>
+                      <div className="text-sm text-gray-400 mb-1">Time Remaining</div>
+                      <div className={`text-2xl font-bold font-mono ${
+                        timeRemaining < 60 
+                          ? 'text-red-400' 
+                          : timeRemaining < 180 
+                            ? 'text-amber-400'
+                            : 'text-emerald-400'
+                      }`}>
+                        {Math.floor(timeRemaining / 60)}:{String(timeRemaining % 60).padStart(2, '0')}
+                      </div>
+                    </div>
+                  </div>
+                  <div className={`text-xs font-semibold px-3 py-1.5 rounded-full ${
+                    timeRemaining < 60 
+                      ? 'bg-red-500/20 text-red-300' 
+                      : timeRemaining < 180 
+                        ? 'bg-amber-500/20 text-amber-300'
+                        : 'bg-emerald-500/20 text-emerald-300'
+                  }`}>
+                    {timeRemaining < 60 ? 'HURRY!' : timeRemaining < 180 ? 'Running Low' : 'In Progress'}
+                  </div>
+                </div>
+              </div>
+
               {activeTask.keywords && (
                 <div className="mb-6 rounded-xl bg-white/5 p-4">
                   <div className="text-sm text-gray-400 mb-2">Keywords</div>
