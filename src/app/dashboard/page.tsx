@@ -325,25 +325,13 @@ export default function DashboardPage() {
                   )}
                 </div>
 
-                <p className="text-sm text-gray-400">
-                  After completing the task, select how much you completed:
-                </p>
-                <div className="grid grid-cols-3 gap-3">
-                  {[50, 75, 100].map(pct => (
-                    <button
-                      key={pct}
-                      onClick={() => handleSubmitClick(pct)}
-                      className={`rounded-xl py-3 font-semibold transition flex items-center justify-center gap-2 ${
-                        pct >= 75
-                          ? "bg-emerald-500 hover:bg-emerald-600 text-white"
-                          : "bg-white/10 hover:bg-white/20 text-gray-300"
-                      }`}
-                    >
-                      <Send className="h-4 w-4" />
-                      {pct}%
-                    </button>
-                  ))}
-                </div>
+                <button
+                  onClick={() => handleSubmitClick(100)}
+                  className="w-full rounded-xl py-3.5 font-semibold transition flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white"
+                >
+                  <Send className="h-5 w-5" />
+                  Submit Task
+                </button>
               </div>
             </div>
           </div>
@@ -358,7 +346,7 @@ export default function DashboardPage() {
           <AlertDialogHeader>
             <AlertDialogTitle className="text-white">Confirm Submission</AlertDialogTitle>
             <AlertDialogDescription className="text-gray-400">
-              Are you sure you want to submit this task? You have uploaded {screenshots.length} screenshot(s) and selected {selectedCompletionPct}% completion.
+              Are you sure you want to submit this task? You have uploaded {screenshots.length} screenshot(s).
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
