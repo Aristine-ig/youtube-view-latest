@@ -262,9 +262,12 @@ export default function DashboardPage() {
   }, [logout, router]);
 
   // Parse video length and convert to seconds
-  const parseVideoLength = (lengthStr: string): number => {
-    if (!lengthStr || typeof lengthStr !== 'string') return 90; // Default 1:30 buffer
-    const lower = lengthStr.toLowerCase().trim();
+  const parseVideoLength = (lengthStr: string | number): number => {
+    if (!lengthStr) return 90; // Default 1:30 buffer
+    
+    // Convert to string if it's a number
+    const str = typeof lengthStr === 'number' ? String(lengthStr) : lengthStr;
+    const lower = str.toLowerCase().trim();
     let totalSeconds = 0;
 
     // Handle HH:MM:SS or MM:SS format
