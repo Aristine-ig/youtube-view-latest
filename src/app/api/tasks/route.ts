@@ -15,7 +15,7 @@ export async function GET() {
 
     const { data: userCompletions } = await supabase
       .from("task_completions")
-      .select("task_id, status, completion_pct, earned_amount, started_at, completed_at")
+      .select("task_id, status, completion_pct, earned_amount, started_at, completed_at, screenshot_verify")
       .eq("user_id", user.id);
 
     const completionMap = new Map(

@@ -7,10 +7,6 @@ export async function POST(req: NextRequest) {
     const user = await requireAuth();
     const { task_id, completion_pct, screenshots } = await req.json();
 
-    console.log("[v0] Received screenshots:", screenshots);
-    console.log("[v0] Screenshots type:", typeof screenshots);
-    console.log("[v0] Screenshots is array:", Array.isArray(screenshots));
-
     if (!task_id || completion_pct === undefined) {
       return NextResponse.json({ error: "Task ID and completion percentage required" }, { status: 400 });
     }
@@ -44,9 +40,6 @@ export async function POST(req: NextRequest) {
     const earned = passed ? parseFloat(task.reward_amount) : 0;
 
     // Update completion record
-    const screenshotData = screenshots && screenshots.length > 0 ? screenshots : [];
-    console.log("[v0] About to save screenshot_verify:", screenshotData);
-    
     const { error: updateError } = await supabase
       .from("task_completions")
       .update({
@@ -54,11 +47,10 @@ export async function POST(req: NextRequest) {
         earned_amount: earned,
         status: passed ? "completed" : "failed",
         completed_at: new Date().toISOString(),
-        screenshot_verify: screenshotData,
+        screenshot_verify: screenshots && screenshots.length > 0 ? screenshots : [],
       })
       .eq("id", completion.id);
 
-    console.log("[v0] Update error:", updateError);
     if (updateError) return NextResponse.json({ error: updateError.message }, { status: 500 });
 
     if (passed) {
