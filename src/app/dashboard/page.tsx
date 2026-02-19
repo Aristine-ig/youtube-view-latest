@@ -145,9 +145,9 @@ export default function DashboardPage() {
           continue;
         }
 
-        // Check file size (500KB = 512000 bytes)
-        if (file.size > 512000) {
-          toast.error(`File "${file.name}" is too large. Maximum size is 500KB`);
+        // Check file size (1MB = 1048576 bytes)
+        if (file.size > 1048576) {
+          toast.error(`File "${file.name}" is too large. Maximum size is 1MB`);
           continue;
         }
 
