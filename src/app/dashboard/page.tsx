@@ -51,6 +51,8 @@ export default function DashboardPage() {
   const [wAmount, setWAmount] = useState("");
   const [wMethod, setWMethod] = useState("");
   const [wDetails, setWDetails] = useState("");
+  const [screenshots, setScreenshots] = useState<string[]>([]);
+  const [uploadingScreenshots, setUploadingScreenshots] = useState(false);
 
   const fetchTasks = useCallback(async () => {
     const res = await fetch("/api/tasks");
@@ -106,12 +108,62 @@ export default function DashboardPage() {
     }
   };
 
+  const handleScreenshotUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+
+    if (screenshots.length >= 3) {
+      toast.error("Maximum 3 screenshots allowed");
+      return;
+    }
+
+    if (screenshots.length + files.length > 3) {
+      toast.error(`You can upload maximum ${3 - screenshots.length} more screenshot(s)`);
+      return;
+    }
+
+    setUploadingScreenshots(true);
+    const newScreenshots = [...screenshots];
+
+    try {
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        if (!file.type.startsWith("image/")) {
+          toast.error("Please select image files only");
+          continue;
+        }
+
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("bucket", "screenshots");
+        
+        const res = await fetch("/api/upload-screenshot", { method: "POST", body: formData });
+        if (res.ok) {
+          const data = await res.json();
+          newScreenshots.push(data.url);
+        } else {
+          toast.error("Failed to upload screenshot");
+        }
+      }
+      setScreenshots(newScreenshots);
+      toast.success(`${newScreenshots.length - screenshots.length} screenshot(s) uploaded`);
+    } catch (err) {
+      toast.error("Failed to upload screenshots");
+    } finally {
+      setUploadingScreenshots(false);
+    }
+  };
+
+  const removeScreenshot = (index: number) => {
+    setScreenshots(screenshots.filter((_, i) => i !== index));
+  };
+
   const completeTask = async (taskId: string, completionPct: number) => {
     try {
       const res = await fetch("/api/tasks/complete", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ task_id: taskId, completion_pct: completionPct }),
+        body: JSON.stringify({ task_id: taskId, completion_pct: completionPct, screenshots }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
@@ -121,6 +173,7 @@ export default function DashboardPage() {
         toast.error(`Only ${data.completion_pct}% completed. Need ${data.min_required}%.`);
       }
       setActiveTask(null);
+      setScreenshots([]);
       await fetchTasks();
       await refresh();
     } catch (err: unknown) {
@@ -216,7 +269,39 @@ export default function DashboardPage() {
                   <p className="text-sm text-gray-300">{activeTask.required_actions}</p>
                 </div>
               )}
-              <div className="space-y-3">
+              <div className="space-y-4">
+                <div>
+                  <p className="text-sm text-gray-400 mb-3">Upload Screenshots (up to 3):</p>
+                  <input
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    onChange={handleScreenshotUpload}
+                    disabled={uploadingScreenshots || screenshots.length >= 3}
+                    className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-white outline-none focus:border-emerald-500 file:mr-4 file:rounded file:border-0 file:bg-emerald-500 file:px-3 file:py-1 file:text-sm file:text-white file:cursor-pointer hover:file:bg-emerald-600"
+                  />
+                  {uploadingScreenshots && <p className="mt-2 text-sm text-gray-400">Uploading...</p>}
+                  
+                  {screenshots.length > 0 && (
+                    <div className="mt-3 grid grid-cols-3 gap-2">
+                      {screenshots.map((url, idx) => (
+                        <div key={idx} className="relative rounded-lg overflow-hidden border border-white/10">
+                          <img src={url} alt={`Screenshot ${idx + 1}`} className="w-full h-24 object-cover" />
+                          <button
+                            onClick={() => removeScreenshot(idx)}
+                            className="absolute top-1 right-1 bg-red-500/80 hover:bg-red-600 rounded-full p-1"
+                          >
+                            <X className="h-4 w-4 text-white" />
+                          </button>
+                          <span className="absolute bottom-1 right-1 bg-black/60 text-white text-xs px-2 py-0.5 rounded">
+                            {idx + 1}/3
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
                 <p className="text-sm text-gray-400">
                   After completing the task, select how much you completed:
                 </p>

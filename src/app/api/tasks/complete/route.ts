@@ -5,7 +5,7 @@ import { requireAuth } from "@/lib/auth";
 export async function POST(req: NextRequest) {
   try {
     const user = await requireAuth();
-    const { task_id, completion_pct } = await req.json();
+    const { task_id, completion_pct, screenshots } = await req.json();
 
     if (!task_id || completion_pct === undefined) {
       return NextResponse.json({ error: "Task ID and completion percentage required" }, { status: 400 });
@@ -47,6 +47,7 @@ export async function POST(req: NextRequest) {
         earned_amount: earned,
         status: passed ? "completed" : "failed",
         completed_at: new Date().toISOString(),
+        screenshots: screenshots && screenshots.length > 0 ? screenshots : [],
       })
       .eq("id", completion.id);
 
