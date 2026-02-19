@@ -246,7 +246,29 @@ export default function DashboardPage() {
   // Active task overlay
     if (activeTask) {
       return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 px-4 py-8 text-white">
+        <>
+          <AlertDialog open={showSubmitConfirm} onOpenChange={setShowSubmitConfirm}>
+            <AlertDialogContent className="bg-gray-900 border-white/10 text-white">
+              <AlertDialogHeader>
+                <AlertDialogTitle className="text-white">Confirm Submission</AlertDialogTitle>
+                <AlertDialogDescription className="text-gray-400">
+                  Are you sure you want to submit this task? You have uploaded {screenshots.length} screenshot(s).
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel className="bg-white/10 hover:bg-white/20 text-white border-white/20">
+                  Cancel
+                </AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={() => activeTask && selectedCompletionPct && completeTask(activeTask.id, selectedCompletionPct)}
+                  className="bg-emerald-500 hover:bg-emerald-600 text-white"
+                >
+                  Submit
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+          <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 px-4 py-8 text-white">
           <div className="mx-auto max-w-3xl">
             <div className="mb-6 rounded-2xl border border-white/10 bg-white/5 p-8">
               <div className="mb-4 flex items-center justify-between">
@@ -345,33 +367,12 @@ export default function DashboardPage() {
             </div>
           </div>
         </div>
+        </>
       );
     }
 
   return (
-    <>
-      <AlertDialog open={showSubmitConfirm} onOpenChange={setShowSubmitConfirm}>
-        <AlertDialogContent className="bg-gray-900 border-white/10 text-white">
-          <AlertDialogHeader>
-            <AlertDialogTitle className="text-white">Confirm Submission</AlertDialogTitle>
-            <AlertDialogDescription className="text-gray-400">
-              Are you sure you want to submit this task? You have uploaded {screenshots.length} screenshot(s).
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel className="bg-white/10 hover:bg-white/20 text-white border-white/20">
-              Cancel
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => activeTask && selectedCompletionPct && completeTask(activeTask.id, selectedCompletionPct)}
-              className="bg-emerald-500 hover:bg-emerald-600 text-white"
-            >
-              Submit
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-      <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 text-white">
+    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 text-white">
       {/* Navbar */}
       <nav className="border-b border-white/10 px-4 sm:px-6 py-3 sm:py-4">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 sm:gap-4">
@@ -647,7 +648,6 @@ export default function DashboardPage() {
         )}
       </div>
     </div>
-    </>
   );
 }
 
