@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
         earned_amount: earned,
         status: passed ? "completed" : "failed",
         completed_at: new Date().toISOString(),
-        screenshot_verify: screenshots && screenshots.length > 0 ? screenshots[0] : null,
+        screenshot_verify: screenshots && screenshots.length > 0 ? screenshots.slice(0, 3) : [],
       })
       .eq("id", completion.id);
 
