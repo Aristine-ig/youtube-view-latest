@@ -6,9 +6,19 @@ import { useEffect, useState, useCallback } from "react";
 import { toast } from "sonner";
 import {
   Play, DollarSign, CheckCircle, Clock, LogOut, ArrowDownToLine,
-  XCircle, Wallet, ChevronDown, ChevronUp, Eye, X
+  XCircle, Wallet, ChevronDown, ChevronUp, Eye, X, Send
 } from "lucide-react";
 import Link from "next/link";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface Task {
   id: string;
@@ -53,6 +63,8 @@ export default function DashboardPage() {
   const [wDetails, setWDetails] = useState("");
   const [screenshots, setScreenshots] = useState<string[]>([]);
   const [uploadingScreenshots, setUploadingScreenshots] = useState(false);
+  const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
+  const [selectedCompletionPct, setSelectedCompletionPct] = useState<number | null>(null);
 
   const fetchTasks = useCallback(async () => {
     const res = await fetch("/api/tasks");
@@ -133,6 +145,12 @@ export default function DashboardPage() {
           continue;
         }
 
+        // Check file size (1MB = 1048576 bytes)
+        if (file.size > 1048576) {
+          toast.error(`File "${file.name}" is too large. Maximum size is 1MB`);
+          continue;
+        }
+
         const formData = new FormData();
         formData.append("file", file);
         formData.append("bucket", "screenshots");
@@ -145,8 +163,11 @@ export default function DashboardPage() {
           toast.error("Failed to upload screenshot");
         }
       }
+      const uploadedCount = newScreenshots.length - screenshots.length;
       setScreenshots(newScreenshots);
-      toast.success(`${newScreenshots.length - screenshots.length} screenshot(s) uploaded`);
+      if (uploadedCount > 0) {
+        toast.success(`${uploadedCount} screenshot(s) uploaded`);
+      }
     } catch (err) {
       toast.error("Failed to upload screenshots");
     } finally {
@@ -158,7 +179,17 @@ export default function DashboardPage() {
     setScreenshots(screenshots.filter((_, i) => i !== index));
   };
 
+  const handleSubmitClick = (pct: number) => {
+    if (screenshots.length === 0) {
+      toast.error("Please upload at least 1 screenshot before submitting");
+      return;
+    }
+    setSelectedCompletionPct(pct);
+    setShowSubmitConfirm(true);
+  };
+
   const completeTask = async (taskId: string, completionPct: number) => {
+    setShowSubmitConfirm(false);
     try {
       const res = await fetch("/api/tasks/complete", {
         method: "POST",
@@ -174,6 +205,7 @@ export default function DashboardPage() {
       }
       setActiveTask(null);
       setScreenshots([]);
+      setSelectedCompletionPct(null);
       await fetchTasks();
       await refresh();
     } catch (err: unknown) {
@@ -214,7 +246,29 @@ export default function DashboardPage() {
   // Active task overlay
     if (activeTask) {
       return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 px-4 py-8 text-white">
+        <>
+          <AlertDialog open={showSubmitConfirm} onOpenChange={setShowSubmitConfirm}>
+            <AlertDialogContent className="bg-gray-900 border-white/10 text-white">
+              <AlertDialogHeader>
+                <AlertDialogTitle className="text-white">Confirm Submission</AlertDialogTitle>
+                <AlertDialogDescription className="text-gray-400">
+                  Are you sure you want to submit this task? You have uploaded {screenshots.length} screenshot(s).
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel className="bg-white/10 hover:bg-white/20 text-white border-white/20">
+                  Cancel
+                </AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={() => activeTask && selectedCompletionPct && completeTask(activeTask.id, selectedCompletionPct)}
+                  className="bg-emerald-500 hover:bg-emerald-600 text-white"
+                >
+                  Submit
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+          <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 px-4 py-8 text-white">
           <div className="mx-auto max-w-3xl">
             <div className="mb-6 rounded-2xl border border-white/10 bg-white/5 p-8">
               <div className="mb-4 flex items-center justify-between">
@@ -302,28 +356,18 @@ export default function DashboardPage() {
                   )}
                 </div>
 
-                <p className="text-sm text-gray-400">
-                  After completing the task, select how much you completed:
-                </p>
-                <div className="grid grid-cols-3 gap-3">
-                  {[50, 75, 100].map(pct => (
-                    <button
-                      key={pct}
-                      onClick={() => completeTask(activeTask.id, pct)}
-                      className={`rounded-xl py-3 font-semibold transition ${
-                        pct >= 75
-                          ? "bg-emerald-500 hover:bg-emerald-600 text-white"
-                          : "bg-white/10 hover:bg-white/20 text-gray-300"
-                      }`}
-                    >
-                      {pct}%
-                    </button>
-                  ))}
-                </div>
+                <button
+                  onClick={() => handleSubmitClick(100)}
+                  className="w-full rounded-xl py-3.5 font-semibold transition flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white"
+                >
+                  <Send className="h-5 w-5" />
+                  Submit Task
+                </button>
               </div>
             </div>
           </div>
         </div>
+        </>
       );
     }
 
