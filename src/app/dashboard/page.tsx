@@ -6,9 +6,18 @@ import { useEffect, useState, useCallback } from "react";
 import { toast } from "sonner";
 import {
   Play, DollarSign, CheckCircle, Clock, LogOut, ArrowDownToLine,
-  XCircle, Wallet, ChevronDown, ChevronUp, Eye, X
+  XCircle, Wallet, ChevronDown, ChevronUp, Eye, X, AlertCircle
 } from "lucide-react";
 import Link from "next/link";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface Task {
   id: string;
@@ -53,6 +62,8 @@ export default function DashboardPage() {
   const [wDetails, setWDetails] = useState("");
   const [screenshots, setScreenshots] = useState<string[]>([]);
   const [uploadingScreenshots, setUploadingScreenshots] = useState(false);
+  const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
+  const [submitCompletionPct, setSubmitCompletionPct] = useState<number | null>(null);
 
   const fetchTasks = useCallback(async () => {
     const res = await fetch("/api/tasks");
@@ -174,11 +185,22 @@ export default function DashboardPage() {
       }
       setActiveTask(null);
       setScreenshots([]);
+      setShowSubmitConfirm(false);
+      setSubmitCompletionPct(null);
       await fetchTasks();
       await refresh();
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : "Failed to complete task");
     }
+  };
+
+  const handleSubmitClick = (pct: number) => {
+    if (screenshots.length === 0) {
+      toast.error("Please upload at least 1 screenshot before submitting");
+      return;
+    }
+    setSubmitCompletionPct(pct);
+    setShowSubmitConfirm(true);
   };
 
   const submitWithdrawal = async (e: React.FormEvent) => {
@@ -309,7 +331,7 @@ export default function DashboardPage() {
                   {[50, 75, 100].map(pct => (
                     <button
                       key={pct}
-                      onClick={() => completeTask(activeTask.id, pct)}
+                      onClick={() => handleSubmitClick(pct)}
                       className={`rounded-xl py-3 font-semibold transition ${
                         pct >= 75
                           ? "bg-emerald-500 hover:bg-emerald-600 text-white"
@@ -326,6 +348,150 @@ export default function DashboardPage() {
         </div>
       );
     }
+
+  // Confirmation dialog
+  if (showSubmitConfirm && activeTask && submitCompletionPct !== null) {
+    return (
+      <>
+        <AlertDialog open={true} onOpenChange={setShowSubmitConfirm}>
+          <AlertDialogContent className="bg-gray-900 border border-white/10">
+            <AlertDialogHeader>
+              <AlertDialogTitle className="text-white flex items-center gap-2">
+                <AlertCircle className="h-5 w-5 text-amber-500" />
+                Confirm Task Submission
+              </AlertDialogTitle>
+              <AlertDialogDescription className="text-gray-400">
+                Are you sure you want to submit this task as {submitCompletionPct}% completed? This action cannot be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <div className="space-y-3 mt-4">
+              <div className="bg-white/5 rounded-lg p-3">
+                <p className="text-sm text-gray-400">Task: <span className="text-white font-medium">{activeTask.title}</span></p>
+              </div>
+              <div className="bg-white/5 rounded-lg p-3">
+                <p className="text-sm text-gray-400">Completion: <span className="text-emerald-400 font-medium">{submitCompletionPct}%</span></p>
+              </div>
+              <div className="bg-white/5 rounded-lg p-3">
+                <p className="text-sm text-gray-400">Screenshots: <span className="text-emerald-400 font-medium">{screenshots.length}/3</span></p>
+              </div>
+            </div>
+            <div className="flex gap-3 mt-6">
+              <AlertDialogCancel className="bg-white/10 hover:bg-white/20 text-white border-white/20">Cancel</AlertDialogCancel>
+              <AlertDialogAction 
+                onClick={() => completeTask(activeTask.id, submitCompletionPct)}
+                className="bg-emerald-500 hover:bg-emerald-600 text-white"
+              >
+                Submit
+              </AlertDialogAction>
+            </div>
+          </AlertDialogContent>
+        </AlertDialog>
+        <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 px-4 py-8 text-white">
+          <div className="mx-auto max-w-3xl">
+            <div className="mb-6 rounded-2xl border border-white/10 bg-white/5 p-8">
+              <div className="mb-4 flex items-center justify-between">
+                <div>
+                  <h2 className="text-2xl font-bold">{activeTask.title || "Task"}</h2>
+                  {activeTask.channel_name && (
+                    <p className="text-sm text-gray-400 mt-1">{activeTask.channel_name}</p>
+                  )}
+                </div>
+                <button onClick={() => setActiveTask(null)} className="text-gray-400 hover:text-white">
+                  <XCircle className="h-6 w-6" />
+                </button>
+              </div>
+              {activeTask.video_thumbnail && (
+                <div className="mb-6 rounded-xl overflow-hidden border border-white/10">
+                  <img src={activeTask.video_thumbnail} alt={activeTask.title} className="w-full h-64 object-cover" />
+                </div>
+              )}
+              <div className="mb-6 grid grid-cols-2 gap-4 rounded-xl bg-white/5 p-4">
+                <div>
+                  <div className="text-sm text-gray-400">Reward</div>
+                  <div className="text-lg font-bold text-emerald-400">${Number(activeTask.reward_amount).toFixed(2)}</div>
+                </div>
+                {activeTask.video_length && (
+                  <div>
+                    <div className="text-sm text-gray-400">Video Length</div>
+                    <div className="font-medium">{activeTask.video_length}</div>
+                  </div>
+                )}
+                {activeTask.channel_name && (
+                  <div>
+                    <div className="text-sm text-gray-400">Channel</div>
+                    <div className="font-medium">{activeTask.channel_name}</div>
+                  </div>
+                )}
+              </div>
+              {activeTask.keywords && (
+                <div className="mb-6 rounded-xl bg-white/5 p-4">
+                  <div className="text-sm text-gray-400 mb-2">Keywords</div>
+                  <div className="flex flex-wrap gap-2">
+                    {activeTask.keywords.split(',').map((keyword, idx) => (
+                      <span key={idx} className="rounded-full bg-emerald-500/10 px-3 py-1 text-sm text-emerald-400">
+                        {keyword.trim()}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {activeTask.required_actions && (
+                <div className="mb-6 rounded-xl bg-amber-500/10 border border-amber-500/20 p-4">
+                  <div className="text-sm font-medium text-amber-400 mb-1">Required Actions</div>
+                  <p className="text-sm text-gray-300">{activeTask.required_actions}</p>
+                </div>
+              )}
+              <div className="space-y-4">
+                <div>
+                  <p className="text-sm text-gray-400 mb-3">Upload Screenshots (up to 3):</p>
+                  <input
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    onChange={handleScreenshotUpload}
+                    disabled={uploadingScreenshots || screenshots.length >= 3}
+                    className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-white outline-none focus:border-emerald-500 file:mr-4 file:rounded file:border-0 file:bg-emerald-500 file:px-3 file:py-1 file:text-sm file:text-white file:cursor-pointer hover:file:bg-emerald-600"
+                  />
+                  {uploadingScreenshots && <p className="mt-2 text-sm text-gray-400">Uploading...</p>}
+                  
+                  {screenshots.length > 0 && (
+                    <div className="mt-3 grid grid-cols-3 gap-2">
+                      {screenshots.map((url, idx) => (
+                        <div key={idx} className="relative rounded-lg overflow-hidden border border-white/10">
+                          <img src={url} alt={`Screenshot ${idx + 1}`} className="w-full h-24 object-cover" />
+                          <button
+                            onClick={() => removeScreenshot(idx)}
+                            className="absolute top-1 right-1 bg-red-500/80 hover:bg-red-600 rounded-full p-1"
+                          >
+                            <X className="h-4 w-4 text-white" />
+                          </button>
+                          <span className="absolute bottom-1 right-1 bg-black/60 text-white text-xs px-2 py-0.5 rounded">
+                            {idx + 1}/3
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <p className="text-sm text-gray-400">
+                  After completing the task, select how much you completed:
+                </p>
+                <div className="grid grid-cols-3 gap-3">
+                  {[50, 75, 100].map(pct => (
+                    <button
+                      key={pct}
+                      onClick={() => handleSubmitClick(pct)}
+                      className={`rounded-xl py-3 font-semibold transition ${
+                        pct >= 75
+                          ? "bg-emerald-500 hover:bg-emerald-600 text-white"
+                          : "bg-white/10 hover:bg-white/20 text-gray-300"
+                      }`}
+                    >
+                      {pct}%
+                    </button>
+                  ))}
+                </div>
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 text-white">
