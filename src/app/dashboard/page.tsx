@@ -104,15 +104,15 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (authLoading) return;
-    if (!user) { 
-      router.push("/login"); 
-      return; 
+    if (!user) {
+      router.push("/login");
+      return;
     }
-    if (user && user.role === "admin") { 
-      router.push("/admin"); 
-      return; 
+    if (user && user.role === "admin") {
+      router.push("/admin");
+      return;
     }
-    
+
     Promise.all([fetchTasks(), fetchWithdrawals()])
       .finally(() => setLoading(false));
   }, [user, authLoading, router, fetchTasks, fetchWithdrawals]);
@@ -171,7 +171,7 @@ export default function DashboardPage() {
         const formData = new FormData();
         formData.append("file", file);
         formData.append("bucket", "screenshots");
-        
+
         const res = await fetch("/api/upload-screenshot", { method: "POST", body: formData });
         if (res.ok) {
           const data = await res.json();
@@ -360,7 +360,7 @@ export default function DashboardPage() {
                     className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-white outline-none focus:border-emerald-500 file:mr-4 file:rounded file:border-0 file:bg-emerald-500 file:px-3 file:py-1 file:text-sm file:text-white file:cursor-pointer hover:file:bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed"
                   />
                   {uploadingScreenshots && <p className="mt-2 text-sm text-gray-400">Uploading...</p>}
-                  
+
                   {screenshots.length > 0 && (
                     <div className="mt-3 grid grid-cols-3 gap-2">
                       {screenshots.map((url, idx) => (
@@ -412,7 +412,7 @@ export default function DashboardPage() {
           <div className="flex items-center gap-2 sm:gap-4 ml-auto">
             <Popover>
               <PopoverTrigger asChild>
-                <button 
+                <button
                   className="group relative flex items-center gap-1.5 rounded-full bg-gradient-to-br from-amber-500/20 to-amber-600/20 hover:from-amber-500/30 hover:to-amber-600/30 border border-amber-500/30 hover:border-amber-400/50 px-3 py-1.5 transition-all duration-200 hover:shadow-lg hover:shadow-amber-500/20 hover:scale-105"
                   aria-label="Important warning"
                 >
@@ -426,7 +426,7 @@ export default function DashboardPage() {
                   <span className="text-xs font-medium text-amber-300 group-hover:text-amber-200 transition-colors hidden sm:inline">Warning</span>
                 </button>
               </PopoverTrigger>
-              <PopoverContent 
+              <PopoverContent
                 className="w-80 sm:w-96 bg-gradient-to-br from-gray-900 via-gray-900 to-gray-950 border-amber-500/30 shadow-xl shadow-amber-500/10 text-white p-0 overflow-hidden"
                 sideOffset={8}
               >
@@ -442,7 +442,7 @@ export default function DashboardPage() {
                       <CheckCircle className="h-3.5 w-3.5 text-emerald-400" />
                     </div>
                     <p className="text-sm text-gray-300 leading-relaxed">
-                      Rewards will only be credited for <strong className="text-emerald-300">genuine, complete, and verified</strong> video views.
+                      Rewards will only be credited for genuine, complete, and verified video views.
                     </p>
                   </div>
                   <div className="flex items-start gap-3 group/item">
@@ -450,7 +450,7 @@ export default function DashboardPage() {
                       <XCircle className="h-3.5 w-3.5 text-red-400" />
                     </div>
                     <p className="text-sm text-gray-300 leading-relaxed">
-                      Use of <strong className="text-red-300">bots, scripts, automation tools, or artificial engagement</strong> is strictly prohibited.
+                      Use of bots, scripts, automation tools, or artificial engagement is strictly prohibited.
                     </p>
                   </div>
                   <div className="flex items-start gap-3 group/item">
@@ -458,7 +458,7 @@ export default function DashboardPage() {
                       <XCircle className="h-3.5 w-3.5 text-red-400" />
                     </div>
                     <p className="text-sm text-gray-300 leading-relaxed">
-                      Accounts involved in suspicious or unfair activity will be <strong className="text-red-300">permanently banned</strong>.
+                      Accounts involved in suspicious or unfair activity will be permanently banned
                     </p>
                   </div>
                 </div>
@@ -472,8 +472,8 @@ export default function DashboardPage() {
               <span className="text-xs sm:text-sm font-bold text-emerald-400">${Number(balance).toFixed(2)}</span>
             </div>
             <span className="text-xs sm:text-sm text-gray-400 hidden sm:inline">{user?.name}</span>
-            <button 
-              onClick={handleLogout} 
+            <button
+              onClick={handleLogout}
               className="text-gray-400 hover:text-white flex-shrink-0 transition"
               aria-label="Logout"
             >
@@ -490,9 +490,8 @@ export default function DashboardPage() {
             <button
               key={t.key}
               onClick={() => setTab(t.key)}
-              className={`flex flex-1 items-center justify-center gap-1 sm:gap-2 rounded-lg py-2 sm:py-3 px-2 sm:px-3 text-xs sm:text-sm font-medium transition whitespace-nowrap ${
-                tab === t.key ? "bg-emerald-500 text-white" : "text-gray-400 hover:text-white"
-              }`}
+              className={`flex flex-1 items-center justify-center gap-1 sm:gap-2 rounded-lg py-2 sm:py-3 px-2 sm:px-3 text-xs sm:text-sm font-medium transition whitespace-nowrap ${tab === t.key ? "bg-emerald-500 text-white" : "text-gray-400 hover:text-white"
+                }`}
             >
               <t.icon className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
               <span className="hidden sm:inline">{t.label}</span>
@@ -505,19 +504,19 @@ export default function DashboardPage() {
         {tab === "tasks" && (
           <div>
             {available.length === 0 ? (
-              <EmptyState 
-                icon={Eye} 
-                title="No tasks available" 
-                description="Check back later for new video tasks." 
+              <EmptyState
+                icon={Eye}
+                title="No tasks available"
+                description="Check back later for new video tasks."
               />
             ) : (
               <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                 {available.map(task => (
-                  <TaskCard 
-                    key={task.id} 
-                    task={task} 
-                    onStart={() => startTask(task.id)} 
-                    starting={startingTask === task.id} 
+                  <TaskCard
+                    key={task.id}
+                    task={task}
+                    onStart={() => startTask(task.id)}
+                    starting={startingTask === task.id}
                   />
                 ))}
               </div>
@@ -529,18 +528,18 @@ export default function DashboardPage() {
         {tab === "ongoing" && (
           <div>
             {ongoing.length === 0 ? (
-              <EmptyState 
-                icon={Clock} 
-                title="No ongoing tasks" 
-                description="Start a task to see it here." 
+              <EmptyState
+                icon={Clock}
+                title="No ongoing tasks"
+                description="Start a task to see it here."
               />
             ) : (
               <div className="space-y-3">
                 {ongoing.map(task => (
-                  <OngoingTaskCard 
-                    key={task.id} 
-                    task={task} 
-                    onView={() => setActiveTask(task)} 
+                  <OngoingTaskCard
+                    key={task.id}
+                    task={task}
+                    onView={() => setActiveTask(task)}
                   />
                 ))}
               </div>
@@ -552,10 +551,10 @@ export default function DashboardPage() {
         {tab === "completed" && (
           <div>
             {completed.length === 0 ? (
-              <EmptyState 
-                icon={CheckCircle} 
-                title="No completed tasks yet" 
-                description="Start watching videos to earn!" 
+              <EmptyState
+                icon={CheckCircle}
+                title="No completed tasks yet"
+                description="Start watching videos to earn!"
               />
             ) : (
               <div className="space-y-3">
@@ -602,14 +601,14 @@ function EmptyState({ icon: Icon, title, description }: { icon: any; title: stri
 // Optimized Task Card Component
 function TaskCard({ task, onStart, starting }: { task: Task; onStart: () => void; starting: boolean }) {
   const [imageError, setImageError] = useState(false);
-  
+
   return (
     <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/5 hover:border-white/20 transition">
       <div className="flex h-40 items-center justify-center bg-white/5">
         {task.video_thumbnail && !imageError ? (
-          <img 
-            src={task.video_thumbnail} 
-            alt="Video thumbnail" 
+          <img
+            src={task.video_thumbnail}
+            alt="Video thumbnail"
             className="h-full w-full object-cover"
             onError={() => setImageError(true)}
             loading="lazy"
@@ -841,10 +840,10 @@ function WithdrawSection({
 
       <div className="space-y-3">
         {withdrawals.length === 0 ? (
-          <EmptyState 
-            icon={DollarSign} 
-            title="No withdrawals yet" 
-            description="" 
+          <EmptyState
+            icon={DollarSign}
+            title="No withdrawals yet"
+            description=""
           />
         ) : (
           withdrawals.map(w => (
@@ -855,11 +854,10 @@ function WithdrawSection({
                   {w.payment_method} &middot; {new Date(w.created_at).toLocaleDateString()}
                 </div>
               </div>
-              <span className={`rounded-full px-3 py-1 text-xs font-medium flex-shrink-0 ${
-                w.status === "approved" ? "bg-emerald-500/10 text-emerald-400" :
-                w.status === "rejected" ? "bg-red-500/10 text-red-400" :
-                "bg-amber-500/10 text-amber-400"
-              }`}>
+              <span className={`rounded-full px-3 py-1 text-xs font-medium flex-shrink-0 ${w.status === "approved" ? "bg-emerald-500/10 text-emerald-400" :
+                  w.status === "rejected" ? "bg-red-500/10 text-red-400" :
+                    "bg-amber-500/10 text-amber-400"
+                }`}>
                 {w.status === "pending" && <Clock className="mr-1 inline h-3 w-3" />}
                 {w.status.charAt(0).toUpperCase() + w.status.slice(1)}
               </span>
