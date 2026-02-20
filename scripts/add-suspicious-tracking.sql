@@ -39,6 +39,6 @@ CREATE INDEX IF NOT EXISTS idx_suspicious_activity_date ON suspicious_activity_l
 
 COMMENT ON TABLE suspicious_activity_log IS 'Logs all suspicious user activities for monitoring and audit purposes';
 COMMENT ON COLUMN task_completions.suspicious_completion IS 'Marks if this completion was flagged as suspicious due to early submissions';
-COMMENT ON COLUMN task_completions.early_submit_count IS 'Number of times user tried to submit before 90% of timer';
+COMMENT ON COLUMN task_completions.early_submit_count IS 'Number of times user tries to submit before 90% of timer';
 COMMENT ON COLUMN users.suspicious_user IS 'Marks if user has been flagged for suspicious behavior';
 COMMENT ON COLUMN users.suspicious_attempts IS 'Total count of suspicious completion attempts by this user';
