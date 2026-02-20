@@ -25,8 +25,10 @@ export async function GET() {
     const totalTasks = tasks.length;
     const activeTasks = tasks.filter(t => t.is_enabled).length;
 
-    const totalCompletions = completions.filter(c => c.status === "completed").length;
-    const pendingCompletions = completions.filter(c => c.status === "pending").length;
+    // Count tasks that are fully completed (completed_count >= max_users)
+    const totalCompletions = tasks.filter(t => t.completed_count >= t.max_users).length;
+    // Count tasks that are in progress (not yet fully completed)
+    const pendingCompletions = tasks.filter(t => t.completed_count > 0 && t.completed_count < t.max_users).length;
     const failedCompletions = completions.filter(c => c.status === "failed").length;
     const fraudFlags = completions.filter(c => c.status === "fraud").length;
 
