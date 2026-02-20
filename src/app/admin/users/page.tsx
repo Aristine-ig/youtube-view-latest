@@ -107,7 +107,7 @@ export default function AdminUsersPage() {
                   <th className="px-3 sm:px-4 py-3 whitespace-nowrap">Role</th>
                   <th className="px-3 sm:px-4 py-3 whitespace-nowrap">Balance</th>
                   <th className="px-3 sm:px-4 py-3 whitespace-nowrap">Status</th>
-                  <th className="px-3 sm:px-4 py-3 whitespace-nowrap">Suspicious</th>
+                  <th className="px-3 sm:px-4 py-3 whitespace-nowrap">Suspicious Attempts</th>
                   <th className="px-3 sm:px-4 py-3 whitespace-nowrap">Joined</th>
                   <th className="px-3 sm:px-4 py-3 whitespace-nowrap text-right">Actions</th>
                 </tr>
