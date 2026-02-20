@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
     // Fetch paginated users
     const { data, error, count } = await supabase
       .from("users")
-      .select("id, email, name, role, balance, status, created_at", { count: "exact" })
+      .select("id, email, name, role, balance, status, created_at, suspicious_attempts", { count: "exact" })
       .order("created_at", { ascending: false })
       .range(offset, offset + limit - 1);
 
