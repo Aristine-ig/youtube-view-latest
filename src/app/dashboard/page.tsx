@@ -51,7 +51,6 @@ interface Withdrawal {
   created_at: string;
 }
 
-// Main Dashboard Component
 export default function DashboardPage() {
   const { user, loading: authLoading, logout, refresh } = useAuth();
   const router = useRouter();
@@ -343,7 +342,9 @@ export default function DashboardPage() {
   // Timer effect for active task
   useEffect(() => {
     if (activeTask && activeTask.video_length) {
+      console.log("[v0] Starting timer for task:", activeTask.id, "video_length:", activeTask.video_length);
       const totalSeconds = parseVideoLength(activeTask.video_length);
+      console.log("[v0] Parsed total seconds:", totalSeconds);
       const startTime = Date.now();
       
       setTaskStartTime(startTime);
