@@ -17,8 +17,8 @@ interface Analytics {
   suspendedUsers: number;
   totalTasks: number;
   activeTasks: number;
-  totalCompletions: number; // Number of tasks fully completed
-  inProgressCompletions: number; // Number of tasks in progress (formerly pendingCompletions)
+  totalCompletions: number;
+  inProgressCompletions: number;
   failedCompletions: number;
   fraudFlags: number;
   completionRate: number;
