@@ -51,6 +51,7 @@ interface Withdrawal {
   created_at: string;
 }
 
+// Main Dashboard Component
 export default function DashboardPage() {
   const { user, loading: authLoading, logout, refresh } = useAuth();
   const router = useRouter();
