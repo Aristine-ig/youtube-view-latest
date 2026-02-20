@@ -22,6 +22,8 @@ interface Task {
   completed_count: number;
   is_enabled: boolean;
   created_at: string;
+  completion_ratio?: number;
+  total_users?: number;
 }
 
 const emptyForm = {
@@ -374,6 +376,7 @@ export default function AdminTasksPage() {
                 <th className="px-4 py-3">Reward</th>
                 <th className="px-4 py-3">Users (Limit)</th>
                 <th className="px-4 py-3">Completions</th>
+                <th className="px-4 py-3">Completion Rate</th>
                 <th className="px-4 py-3">Status</th>
                 <th className="px-4 py-3">Actions</th>
               </tr>
@@ -388,6 +391,18 @@ export default function AdminTasksPage() {
                   <td className="px-4 py-3 text-emerald-400 font-medium">${Number(task.reward_amount).toFixed(2)}</td>
                   <td className="px-4 py-3">{task.max_users}</td>
                   <td className="px-4 py-3">{task.completed_count}</td>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-2">
+                      <div className="h-1.5 w-16 rounded-full bg-white/10 overflow-hidden">
+                        <div 
+                          className="h-full bg-emerald-500 rounded-full" 
+                          style={{ width: `${Math.min(100, task.completion_ratio || 0)}%` }}
+                        />
+                      </div>
+                      <span className="text-xs text-gray-400 whitespace-nowrap">{Math.round(task.completion_ratio || 0)}%</span>
+                    </div>
+                    <span className="text-xs text-gray-500 mt-1 block">{task.completed_count}/{task.total_users}</span>
+                  </td>
                   <td className="px-4 py-3">
                     <button onClick={() => toggleTask(task)}>
                       {task.is_enabled
@@ -409,7 +424,7 @@ export default function AdminTasksPage() {
                 </tr>
               ))}
               {tasks.length === 0 && (
-                <tr><td colSpan={9} className="px-4 py-12 text-center text-gray-500">No tasks yet. Click &quot;Add Task&quot; to create one.</td></tr>
+                <tr><td colSpan={11} className="px-4 py-12 text-center text-gray-500">No tasks yet. Click &quot;Add Task&quot; to create one.</td></tr>
               )}
             </tbody>
           </table>

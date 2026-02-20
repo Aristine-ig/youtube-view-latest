@@ -5,13 +5,26 @@ import { requireAdmin } from "@/lib/auth";
 export async function GET() {
   try {
     await requireAdmin();
-    const { data, error } = await supabase
+    const { data: tasks, error } = await supabase
       .from("tasks")
       .select("*")
       .order("created_at", { ascending: false });
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-    return NextResponse.json({ tasks: data });
+
+    // Get total number of users
+    const { count: totalUsers } = await supabase
+      .from("users")
+      .select("*", { count: "exact", head: true });
+
+    // Enrich tasks with completion ratio
+    const tasksWithRatio = tasks.map(task => ({
+      ...task,
+      completion_ratio: totalUsers ? (task.completed_count / totalUsers) * 100 : 0,
+      total_users: totalUsers || 0
+    }));
+
+    return NextResponse.json({ tasks: tasksWithRatio });
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : "Error";
     return NextResponse.json({ error: msg }, { status: msg === "Forbidden" ? 403 : 401 });
