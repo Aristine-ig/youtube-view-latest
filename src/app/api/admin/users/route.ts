@@ -12,14 +12,34 @@ export async function GET(req: NextRequest) {
     const offset = (page - 1) * limit;
 
     // Fetch paginated users
-    const { data, error, count } = await supabase
+    const { data: users, error, count } = await supabase
       .from("users")
       .select("id, email, name, role, balance, status, created_at", { count: "exact" })
       .order("created_at", { ascending: false })
       .range(offset, offset + limit - 1);
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-    return NextResponse.json({ users: data, total: count || 0 });
+
+    // Get suspicious attempts count for each user from suspicious_activity_log
+    const userIds = users?.map(u => u.id) || [];
+    const { data: logCounts } = await supabase
+      .from("suspicious_activity_log")
+      .select("user_id")
+      .in("user_id", userIds);
+
+    // Count occurrences per user
+    const suspiciousCountMap = (logCounts || []).reduce((acc, log) => {
+      acc[log.user_id] = (acc[log.user_id] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+    // Add suspicious_attempts to each user
+    const usersWithCounts = users?.map(user => ({
+      ...user,
+      suspicious_attempts: suspiciousCountMap[user.id] || 0
+    }));
+
+    return NextResponse.json({ users: usersWithCounts, total: count || 0 });
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : "Error";
     return NextResponse.json({ error: msg }, { status: msg === "Forbidden" ? 403 : 401 });

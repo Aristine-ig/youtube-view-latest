@@ -17,6 +17,7 @@ interface User {
   balance: number;
   status: string;
   created_at: string;
+  suspicious_attempts: number;
 }
 
 export default function AdminUsersPage() {
@@ -106,6 +107,7 @@ export default function AdminUsersPage() {
                   <th className="px-3 sm:px-4 py-3 whitespace-nowrap">Role</th>
                   <th className="px-3 sm:px-4 py-3 whitespace-nowrap">Balance</th>
                   <th className="px-3 sm:px-4 py-3 whitespace-nowrap">Status</th>
+                  <th className="px-3 sm:px-4 py-3 whitespace-nowrap">Suspicious Attempts</th>
                   <th className="px-3 sm:px-4 py-3 whitespace-nowrap">Joined</th>
                   <th className="px-3 sm:px-4 py-3 whitespace-nowrap text-right">Actions</th>
                 </tr>
@@ -125,6 +127,15 @@ export default function AdminUsersPage() {
                       <span className={`rounded-full px-2 py-0.5 text-xs font-medium inline-block ${u.status === "active" ? "bg-emerald-500/10 text-emerald-400" : "bg-red-500/10 text-red-400"}`}>
                         {u.status}
                       </span>
+                    </td>
+                    <td className="px-3 sm:px-4 py-3 whitespace-nowrap">
+                      {(u.suspicious_attempts || 0) > 0 ? (
+                        <span className="text-red-400 text-xs font-medium">
+                          {u.suspicious_attempts}
+                        </span>
+                      ) : (
+                        <span className="text-gray-500 text-xs">0</span>
+                      )}
                     </td>
                     <td className="px-3 sm:px-4 py-3 text-gray-400 whitespace-nowrap text-xs sm:text-sm">{new Date(u.created_at).toLocaleDateString()}</td>
                     <td className="px-3 sm:px-4 py-3 whitespace-nowrap">

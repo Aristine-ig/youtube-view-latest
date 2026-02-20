@@ -73,6 +73,8 @@ export default function DashboardPage() {
   const [selectedCompletionPct, setSelectedCompletionPct] = useState<number | null>(null);
   const [timeRemaining, setTimeRemaining] = useState<number>(0);
   const [taskStartTime, setTaskStartTime] = useState<number | null>(null);
+  const [taskTotalDuration, setTaskTotalDuration] = useState<number>(0);
+  const [earlySubmitAttempts, setEarlySubmitAttempts] = useState<number>(0);
   const timerIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const fetchTasks = useCallback(async () => {
@@ -205,17 +207,48 @@ export default function DashboardPage() {
       toast.error("Please upload at least 1 screenshot before submitting");
       return;
     }
+
+    // Check if user is submitting before 90% of timer is complete
+    const elapsedTime = taskTotalDuration - timeRemaining;
+    const requiredTime = taskTotalDuration * 0.9; // 90% of total duration
+    
+    if (elapsedTime < requiredTime) {
+      const newAttempts = earlySubmitAttempts + 1;
+      setEarlySubmitAttempts(newAttempts);
+      
+      if (newAttempts <= 2) {
+        // First and second attempt: show warning
+        const timeNeeded = Math.ceil((requiredTime - elapsedTime) / 60);
+        toast.error(`Please watch the video completely. You need to wait ${timeNeeded} more minute(s).`);
+        return;
+      }
+      // Third attempt will continue and be marked as suspicious
+    }
+
     setSelectedCompletionPct(pct);
     setShowSubmitConfirm(true);
-  }, [screenshots.length]);
+  }, [screenshots.length, timeRemaining, taskTotalDuration, earlySubmitAttempts]);
 
   const completeTask = async (taskId: string, completionPct: number) => {
     setShowSubmitConfirm(false);
     try {
+      // Calculate submission timing
+      const elapsedTime = taskTotalDuration - timeRemaining;
+      const requiredTime = taskTotalDuration * 0.9;
+      const isSuspicious = earlySubmitAttempts >= 2 && elapsedTime < requiredTime;
+
       const res = await fetch("/api/tasks/complete", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ task_id: taskId, completion_pct: completionPct, screenshots }),
+        body: JSON.stringify({ 
+          task_id: taskId, 
+          completion_pct: completionPct, 
+          screenshots,
+          task_duration_seconds: taskTotalDuration,
+          submission_time_seconds: Math.floor(elapsedTime),
+          early_submit_count: earlySubmitAttempts,
+          suspicious_completion: isSuspicious
+        }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
@@ -227,6 +260,8 @@ export default function DashboardPage() {
       setActiveTask(null);
       setScreenshots([]);
       setSelectedCompletionPct(null);
+      setEarlySubmitAttempts(0);
+      setTaskTotalDuration(0);
       await fetchTasks();
       await refresh();
     } catch (err: unknown) {
@@ -314,6 +349,8 @@ export default function DashboardPage() {
       
       setTaskStartTime(startTime);
       setTimeRemaining(totalSeconds);
+      setTaskTotalDuration(totalSeconds);
+      setEarlySubmitAttempts(0);
 
       if (timerIntervalRef.current) {
         clearInterval(timerIntervalRef.current);

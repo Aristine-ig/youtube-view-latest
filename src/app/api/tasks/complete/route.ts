@@ -5,7 +5,15 @@ import { requireAuth } from "@/lib/auth";
 export async function POST(req: NextRequest) {
   try {
     const user = await requireAuth();
-    const { task_id, completion_pct, screenshots } = await req.json();
+    const { 
+      task_id, 
+      completion_pct, 
+      screenshots, 
+      task_duration_seconds,
+      submission_time_seconds,
+      early_submit_count,
+      suspicious_completion 
+    } = await req.json();
 
     if (!task_id || completion_pct === undefined) {
       return NextResponse.json({ error: "Task ID and completion percentage required" }, { status: 400 });
@@ -48,10 +56,39 @@ export async function POST(req: NextRequest) {
         status: passed ? "completed" : "failed",
         completed_at: new Date().toISOString(),
         screenshot_verify: screenshots && screenshots.length > 0 ? screenshots.slice(0, 3) : [],
+        suspicious_completion: suspicious_completion || false,
+        early_submit_count: early_submit_count || 0,
+        task_duration_seconds: task_duration_seconds || null,
+        submission_time_seconds: submission_time_seconds || null,
       })
       .eq("id", completion.id);
 
     if (updateError) return NextResponse.json({ error: updateError.message }, { status: 500 });
+
+    // Handle suspicious completion
+    if (suspicious_completion) {
+      // Increment user's suspicious attempts counter
+      await supabase
+        .from("users")
+        .update({ 
+          suspicious_user: true,
+          suspicious_attempts: (user.suspicious_attempts || 0) + 1
+        })
+        .eq("id", user.id);
+
+      // Log suspicious activity
+      await supabase
+        .from("suspicious_activity_log")
+        .insert({
+          user_id: user.id,
+          task_completion_id: completion.id,
+          activity_type: "early_submission",
+          task_duration_seconds: task_duration_seconds,
+          submission_time_seconds: submission_time_seconds,
+          early_submit_count: early_submit_count,
+          details: `User attempted to submit before 90% of timer ${early_submit_count} times. Task duration: ${task_duration_seconds}s, submitted at: ${submission_time_seconds}s`,
+        });
+    }
 
     if (passed) {
       // Credit user balance
