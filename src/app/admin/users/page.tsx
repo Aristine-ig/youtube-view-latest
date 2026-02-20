@@ -130,8 +130,7 @@ export default function AdminUsersPage() {
                     </td>
                     <td className="px-3 sm:px-4 py-3 whitespace-nowrap">
                       {(u.suspicious_attempts || 0) > 0 ? (
-                        <span className="rounded-full bg-red-500/10 text-red-400 px-2 py-0.5 text-xs font-medium inline-flex items-center gap-1">
-                          <span className="h-1.5 w-1.5 rounded-full bg-red-400"></span>
+                        <span className="rounded-full bg-red-500/10 text-red-400 px-2 py-0.5 text-xs font-medium">
                           {u.suspicious_attempts}
                         </span>
                       ) : (
