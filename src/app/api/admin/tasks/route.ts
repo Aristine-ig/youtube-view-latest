@@ -12,16 +12,10 @@ export async function GET() {
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-    // Get total number of users
-    const { count: totalUsers } = await supabase
-      .from("users")
-      .select("*", { count: "exact", head: true });
-
-    // Enrich tasks with completion ratio
+    // Enrich tasks with completion ratio (completed_count / max_users)
     const tasksWithRatio = tasks.map(task => ({
       ...task,
-      completion_ratio: totalUsers ? (task.completed_count / totalUsers) * 100 : 0,
-      total_users: totalUsers || 0
+      completion_ratio: task.max_users ? (task.completed_count / task.max_users) * 100 : 0
     }));
 
     return NextResponse.json({ tasks: tasksWithRatio });

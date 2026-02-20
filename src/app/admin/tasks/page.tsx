@@ -401,7 +401,7 @@ export default function AdminTasksPage() {
                       </div>
                       <span className="text-xs text-gray-400 whitespace-nowrap">{Math.round(task.completion_ratio || 0)}%</span>
                     </div>
-                    <span className="text-xs text-gray-500 mt-1 block">{task.completed_count}/{task.total_users}</span>
+                    <span className="text-xs text-gray-500 mt-1 block">{task.completed_count}/{task.max_users}</span>
                   </td>
                   <td className="px-4 py-3">
                     <button onClick={() => toggleTask(task)}>
