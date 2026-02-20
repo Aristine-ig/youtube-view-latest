@@ -20,9 +20,9 @@ CREATE INDEX IF NOT EXISTS idx_suspicious_completions ON task_completions(suspic
 
 -- Create a table to log all suspicious activities for audit
 CREATE TABLE IF NOT EXISTS suspicious_activity_log (
-  id SERIAL PRIMARY KEY,
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  task_completion_id INTEGER REFERENCES task_completions(id) ON DELETE SET NULL,
+  task_completion_id UUID REFERENCES task_completions(id) ON DELETE SET NULL,
   activity_type VARCHAR(50) NOT NULL,
   task_duration_seconds INTEGER,
   submission_time_seconds INTEGER,
