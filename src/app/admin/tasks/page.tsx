@@ -388,16 +388,7 @@ export default function AdminTasksPage() {
                   <td className="px-4 py-3 max-w-[200px] truncate">{task.required_actions || "-"}</td>
                   <td className="px-4 py-3 text-emerald-400 font-medium">${Number(task.reward_amount).toFixed(2)}</td>
                   <td className="px-4 py-3">
-                    <div className="flex items-center gap-2">
-                      <div className="h-1.5 w-16 rounded-full bg-white/10 overflow-hidden">
-                        <div 
-                          className="h-full bg-emerald-500 rounded-full" 
-                          style={{ width: `${Math.min(100, task.completion_ratio || 0)}%` }}
-                        />
-                      </div>
-                      <span className="text-xs text-gray-400 whitespace-nowrap">{Math.round(task.completion_ratio || 0)}%</span>
-                    </div>
-                    <span className="text-xs text-gray-500 mt-1 block">{task.completed_count}/{task.max_users}</span>
+                    <span className="text-sm text-gray-300">{task.completed_count}/{task.max_users}</span>
                   </td>
                   <td className="px-4 py-3">
                     <button onClick={() => toggleTask(task)}>
