@@ -3,7 +3,6 @@
 import { useAuth } from "@/components/auth-provider";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useCallback, useMemo, useRef } from "react";
-// Dashboard with timer, suspicious tracking, and submit confirmation
 import { toast } from "sonner";
 import {
   Play, DollarSign, CheckCircle, Clock, LogOut, ArrowDownToLine,
