@@ -211,11 +211,11 @@ export default function DashboardPage() {
     // Check if user is submitting before 90% of timer is complete
     const elapsedTime = taskTotalDuration - timeRemaining;
     const requiredTime = taskTotalDuration * 0.9; // 90% of total duration
-    
+
     if (elapsedTime < requiredTime) {
       const newAttempts = earlySubmitAttempts + 1;
       setEarlySubmitAttempts(newAttempts);
-      
+
       if (newAttempts <= 2) {
         // First and second attempt: show warning
         const timeNeeded = Math.ceil((requiredTime - elapsedTime) / 60);
@@ -240,9 +240,9 @@ export default function DashboardPage() {
       const res = await fetch("/api/tasks/complete", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          task_id: taskId, 
-          completion_pct: completionPct, 
+        body: JSON.stringify({
+          task_id: taskId,
+          completion_pct: completionPct,
           screenshots,
           task_duration_seconds: taskTotalDuration,
           submission_time_seconds: Math.floor(elapsedTime),
@@ -299,7 +299,7 @@ export default function DashboardPage() {
   // Parse video length and convert to seconds
   const parseVideoLength = (lengthStr: string | number): number => {
     if (!lengthStr) return 90; // Default 1:30 buffer
-    
+
     // Convert to string if it's a number
     const str = typeof lengthStr === 'number' ? String(lengthStr) : lengthStr;
     const lower = str.toLowerCase().trim();
@@ -313,12 +313,12 @@ export default function DashboardPage() {
       } else if (parts.length === 2) {
         totalSeconds = parts[0] * 60 + parts[1];
       }
-    } 
+    }
     // Handle "X minutes" or "X min"
     else if (lower.includes('minute') || lower.includes('min')) {
       const match = lower.match(/(\d+)/);
       if (match) totalSeconds = parseInt(match[1]) * 60;
-    } 
+    }
     // Handle "X hours" or "X hr"
     else if (lower.includes('hour') || lower.includes('hr')) {
       const match = lower.match(/(\d+)/);
@@ -346,7 +346,7 @@ export default function DashboardPage() {
       const totalSeconds = parseVideoLength(activeTask.video_length);
       console.log("[v0] Parsed total seconds:", totalSeconds);
       const startTime = Date.now();
-      
+
       setTaskStartTime(startTime);
       setTimeRemaining(totalSeconds);
       setTaskTotalDuration(totalSeconds);
@@ -455,50 +455,45 @@ export default function DashboardPage() {
               </div>
 
               {/* Timer Display */}
-              <div className={`mb-6 rounded-xl border p-4 ${
-                timeRemaining < 60 
-                  ? 'bg-red-500/10 border-red-500/30' 
-                  : timeRemaining < 180 
+              <div className={`mb-6 rounded-xl border p-4 ${timeRemaining < 60
+                  ? 'bg-red-500/10 border-red-500/30'
+                  : timeRemaining < 180
                     ? 'bg-amber-500/10 border-amber-500/30'
                     : 'bg-emerald-500/10 border-emerald-500/30'
-              }`}>
+                }`}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className={`flex items-center justify-center rounded-lg p-2 ${
-                      timeRemaining < 60 
-                        ? 'bg-red-500/20' 
-                        : timeRemaining < 180 
+                    <div className={`flex items-center justify-center rounded-lg p-2 ${timeRemaining < 60
+                        ? 'bg-red-500/20'
+                        : timeRemaining < 180
                           ? 'bg-amber-500/20'
                           : 'bg-emerald-500/20'
-                    }`}>
-                      <Clock className={`h-5 w-5 ${
-                        timeRemaining < 60 
-                          ? 'text-red-400' 
-                          : timeRemaining < 180 
+                      }`}>
+                      <Clock className={`h-5 w-5 ${timeRemaining < 60
+                          ? 'text-red-400'
+                          : timeRemaining < 180
                             ? 'text-amber-400'
                             : 'text-emerald-400'
-                      }`} />
+                        }`} />
                     </div>
                     <div>
                       <div className="text-sm text-gray-400 mb-1">Time Remaining</div>
-                      <div className={`text-2xl font-bold font-mono ${
-                        timeRemaining < 60 
-                          ? 'text-red-400' 
-                          : timeRemaining < 180 
+                      <div className={`text-2xl font-bold font-mono ${timeRemaining < 60
+                          ? 'text-red-400'
+                          : timeRemaining < 180
                             ? 'text-amber-400'
                             : 'text-emerald-400'
-                      }`}>
+                        }`}>
                         {Math.floor(timeRemaining / 60)}:{String(timeRemaining % 60).padStart(2, '0')}
                       </div>
                     </div>
                   </div>
-                  <div className={`text-xs font-semibold px-3 py-1.5 rounded-full ${
-                    timeRemaining < 60 
-                      ? 'bg-red-500/20 text-red-300' 
-                      : timeRemaining < 180 
+                  <div className={`text-xs font-semibold px-3 py-1.5 rounded-full ${timeRemaining < 60
+                      ? 'bg-red-500/20 text-red-300'
+                      : timeRemaining < 180
                         ? 'bg-amber-500/20 text-amber-300'
                         : 'bg-emerald-500/20 text-emerald-300'
-                  }`}>
+                    }`}>
                     {timeRemaining < 60 ? 'HURRY!' : timeRemaining < 180 ? 'Running Low' : 'In Progress'}
                   </div>
                 </div>
